@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package routerclientpb;
+
+option go_package = "github.com/go-micro/router/proto/routerclientpb;routerclientpb";
+
+import "google/protobuf/empty.proto";
+
+service RouterClient {
+    rpc Routes (google.protobuf.Empty) returns (RoutesReply) {}
+}
+
+message RoutesReply {
+    message Route {
+	    // isGlobal=True == no prefix route
+        bool isGlobal = 1;
+        string method = 2;
+        string path = 3;
+        string endpoint = 4;
+        repeated string params = 5;
+    }
+
+    string routerURI = 1;
+    repeated Route routes = 2;
+}

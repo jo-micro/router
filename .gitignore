@@ -1,0 +1,7 @@
+.task/
+
+!.gitkeep
+
+*.pb.go
+*.pb.micro.go
+.env

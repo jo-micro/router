@@ -1,0 +1,81 @@
+version: '3'
+
+tasks:
+  default:
+    cmds: 
+      - task: volume
+      - task: podman
+
+  volume:
+    run: "once"
+    cmds:
+      - podman volume inspect micro_router_go 1>/dev/null 2>&1 || podman volume create micro_router_go
+
+  build:builder:
+    deps: 
+      - volume
+    cmds: 
+      - podman build -v "{{.VOLUME_PATH}}:/go:rw" -t docker.io/pcdummy/go-micro-router-builder:latest -f ./docker/builder/Dockerfile .
+    sources:
+      - ./docker/builder/Dockerfile
+    vars:
+      VOLUME_PATH:
+        sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
+
+  builder:
+    desc: Run something in the builder container for example "task builder -- go get -u ./..."
+    deps:
+      - build:builder
+    cmds:
+      - podman run --rm -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" docker.io/pcdummy/go-micro-router-builder:latest {{.CLI_ARGS}}
+    vars:
+      VOLUME_PATH:
+        sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
+
+  protoc:
+    desc: Generate protobruf go files
+    sources:
+      - ./proto/**/*.proto
+    cmds:
+      - task: builder
+        vars:
+          CLI_ARGS: /bin/sh -c 'cd ./proto/routerclientpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerclientpb.proto'
+    
+  podman:
+    desc: Generate docker container for go-micro-router tagged as docker.io/pcdummy/go-micro-router:latest
+    deps:
+      - protoc
+    sources:
+      - ./go.sum
+      - ./**/*.go
+      - ./docker/go-micro-router/Dockerfile
+    cmds:
+      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/go-micro-router/Dockerfile .
+    vars:
+      DATE:
+        sh: date +%s
+      VOLUME_PATH:
+        sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
+
+  tidy:
+    desc: Run "go mod tidy" in a container
+    cmds:
+      - task: builder
+        vars:
+          CLI_ARGS: go mod tidy
+
+  update:
+    desc: Run "go get -u ./..." in a container
+    cmds:
+      - task: builder
+        vars:
+          CLI_ARGS: go get -u ./...
+
+  rm:
+    desc: Remove all persistent data
+    cmds:
+      - podman image rm docker.io/pcdummy/go-micro-router-builder:latest || exit 0
+      # Don't delete the result
+      # - podman image rm docker.io/pcdummy/go-micro-router:latest || exit 0
+      - podman volume rm micro_router_go || exit 0
+      - rm -rf $PWD/.task
