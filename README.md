@@ -1,9 +1,9 @@
-# go-micro-router
+# router
 
 A dynamic router (API Gatway) for go-micro.
 
-It looks for services that host "proto/routerclientpb/routerclientpb.RouterClient" and ask's them for services,
-then it registers that service via a proxy method with gin.
+It looks for services that host "proto/routerclientpb/routerclientpb.RouterClient" and ask's them for routes/endpoints,
+then it registers that endpoints via a proxy method with gin.
 
 ## Caveats
 
