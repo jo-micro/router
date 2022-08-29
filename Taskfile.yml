@@ -1,5 +1,13 @@
 version: '3'
 
+vars:
+  GIT_TAG: 
+    sh: git tag --points-at HEAD
+  GIT_COMMIT:
+    sh: git rev-parse HEAD
+  VERSION:
+    sh: if test -z "{{.GIT_TAG}}"; then echo "{{.GIT_COMMIT}}"; else echo "{{.GIT_TAG}}"; fi
+
 tasks:
   default:
     cmds: 
@@ -40,17 +48,13 @@ tasks:
       - task: builder
         vars:
           CLI_ARGS: /bin/sh -c 'cd ./proto/routerclientpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerclientpb.proto'
-    
+
   podman:
     desc: Generate docker container for go-micro-router tagged as docker.io/pcdummy/go-micro-router:latest
     deps:
       - protoc
-    sources:
-      - ./go.sum
-      - ./**/*.go
-      - ./docker/go-micro-router/Dockerfile
     cmds:
-      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/go-micro-router/Dockerfile .
+      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg=VERSION={{.VERSION}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/go-micro-router/Dockerfile .
     vars:
       DATE:
         sh: date +%s
