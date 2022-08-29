@@ -49,8 +49,7 @@ tasks:
         vars:
           CLI_ARGS: /bin/sh -c 'cd ./proto/routerclientpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerclientpb.proto'
 
-  podman:
-    desc: Generate docker container for go-micro-router tagged as docker.io/pcdummy/go-micro-router:latest
+  build:podman:
     deps:
       - protoc
     cmds:
@@ -60,6 +59,18 @@ tasks:
         sh: date +%s
       VOLUME_PATH:
         sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
+  
+  tag:podman:
+    cmds:
+      - podman tag docker.io/pcdummy/go-micro-router:latest docker.io/pcdummy/go-micro-router:{{.GIT_TAG}}
+    status:
+      - test -z "{{.GIT_TAG}}"
+
+  podman:
+    desc: Generate docker container for go-micro-router tagged as docker.io/pcdummy/go-micro-router:latest and :GIT_TAG if theres a tag
+    cmds:
+      - task: build:podman
+      - task: tag:podman
 
   tidy:
     desc: Run "go mod tidy" in a container
