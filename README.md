@@ -3,11 +3,11 @@
 A dynamic router (API Gatway) for go-micro.
 
 It looks for services that host "proto/routerclientpb/routerclientpb.RouterClient" and ask's them for routes/endpoints,
-then it registers that endpoints via a proxy method with gin.
+then it registers that endpoints via a proxy method within gin.
 
 ## Caveats
 
-- gin doesn't allow to delete routes, so if you want to delete and/or update a route you have to restart go-micro/router.
+- gin doesn't allow to delete routes, so if you want to delete a route you have to restart go-micro/router.
 
 ## Build podman/docker image
 
