@@ -49,13 +49,15 @@ func (h *Handler) Start() error {
 		ctx := context.Background()
 
 		for {
-			services, err := util.FindByEndpoint(h.service, routerclientpb.RouterClientService.Routes)
+			services, err := util.FindByEndpoint(h.service, "RouterClient.Routes")
 			if err != nil {
 				logger.Error(err)
 				continue
 			}
 
 			for _, s := range services {
+				logger.Info("Found service '%s'", s.Name)
+
 				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
 				resp, err := client.Routes(ctx, &emptypb.Empty{})
 				if err != nil {

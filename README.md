@@ -22,7 +22,7 @@ then it registers that endpoints via a proxy method within gin.
 task
 ```
 
-### Remove everything except the result created by task
+### Remove everything except the resulting podman images created by task
 
 ```bash
 task rm

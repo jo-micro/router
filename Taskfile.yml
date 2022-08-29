@@ -5,14 +5,20 @@ vars:
     sh: git tag --points-at HEAD
   GIT_COMMIT:
     sh: git rev-parse HEAD
+  GIT_DIRTY:
+    sh: git status -s
   VERSION:
-    sh: if test -z "{{.GIT_TAG}}"; then echo "{{.GIT_COMMIT}}"; elif test -n "{{.GIT_TAG}}"; then echo "{{.GIT_TAG}}"; else echo "dirty"; fi
+    sh: if test "{{.GIT_DIRTY}}" != ""; then echo "{{.GIT_COMMIT}}-dirty"; elif test "{{.GIT_TAG}}" != ""; then echo "{{.GIT_TAG}}"; else echo "{{.GIT_COMMIT}}"; fi
 
 tasks:
   default:
     cmds: 
       - task: volume
       - task: podman
+
+  version:
+    cmds:
+      - echo "{{.VERSION}}"
 
   volume:
     run: "once"
@@ -64,13 +70,23 @@ tasks:
     cmds:
       - podman tag docker.io/pcdummy/go-micro-router:latest docker.io/pcdummy/go-micro-router:{{.GIT_TAG}}
     status:
-      - test -z "{{.GIT_TAG}}"
+      - test "{{.VERSION}}" != "{{.GIT_TAG}}"
 
   podman:
     desc: Generate docker container for go-micro-router tagged as docker.io/pcdummy/go-micro-router:latest and :GIT_TAG if theres a tag
     cmds:
       - task: build:podman
       - task: tag:podman
+
+  publish:
+    desc: Publish images to docker.io, this requires the current commit to be a git tag
+    deps:
+      - podman
+    cmds:
+      - podman publish docker.io/pcdummy/go-micro-router:latest
+      - podman publish docker.io/pcdummy/go-micro-router:{{.GIT_TAG}}
+    status:
+      - test "{{.VERSION}}" != "{{.GIT_TAG}}"
 
   tidy:
     desc: Run "go mod tidy" in a container
