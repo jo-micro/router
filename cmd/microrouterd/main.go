@@ -18,6 +18,10 @@ func main() {
 		micro.Server(httpServer.NewServer()),
 	)
 
+	if err := config.Load(); err != nil {
+		logger.Fatal(err)
+	}
+
 	if config.GetServerConfig().Env == config.EnvProd {
 		gin.SetMode(gin.ReleaseMode)
 	}

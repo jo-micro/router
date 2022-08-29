@@ -6,7 +6,7 @@ vars:
   GIT_COMMIT:
     sh: git rev-parse HEAD
   VERSION:
-    sh: if test -z "{{.GIT_TAG}}"; then echo "{{.GIT_COMMIT}}"; else echo "{{.GIT_TAG}}"; fi
+    sh: if test -z "{{.GIT_TAG}}"; then echo "{{.GIT_COMMIT}}"; elif test -n "{{.GIT_TAG}}"; then echo "{{.GIT_TAG}}"; else echo "dirty"; fi
 
 tasks:
   default:

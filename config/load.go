@@ -2,11 +2,11 @@ package config
 
 import (
 	"os"
-	"runtime/debug"
 	"strings"
 
 	"github.com/go-micro/plugins/v4/config/encoder/toml"
 	"github.com/go-micro/plugins/v4/config/encoder/yaml"
+	"github.com/go-micro/router/util"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4/config"
 	"go-micro.dev/v4/config/reader"
@@ -23,21 +23,6 @@ var _cfg *Config = &Config{
 		Address:        ":8080",
 		RefreshSeconds: 10,
 	},
-}
-
-// goSafe will run func in goroutine safely, avoid crash from unexpected panic
-func goSafe(fn func()) {
-	if fn == nil {
-		return
-	}
-	go func() {
-		defer func() {
-			if e := recover(); e != nil {
-				logger.Errorf("[panic]%v\n%s", e, debug.Stack())
-			}
-		}()
-		fn()
-	}()
 }
 
 // Load will load configurations and update it when changed
@@ -81,7 +66,7 @@ func Load() error {
 	if err != nil {
 		return errors.Wrap(err, "configor.Watch")
 	}
-	goSafe(func() {
+	util.GoSafe(func() {
 		for {
 			v, err := w.Next()
 			if err != nil {
