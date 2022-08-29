@@ -1,6 +1,6 @@
 module github.com/go-micro/router
 
-go 1.18
+go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.8.1
@@ -20,6 +20,13 @@ require (
 	github.com/go-micro/plugins/v4/registry/nats v1.1.0
 	github.com/go-micro/plugins/v4/registry/zookeeper v1.1.0
 	github.com/go-micro/plugins/v4/server/http v1.1.0
+	github.com/go-micro/plugins/v4/transport/grpc v1.1.0
+	github.com/go-micro/plugins/v4/transport/http v1.1.0
+	github.com/go-micro/plugins/v4/transport/nats v1.1.0
+	github.com/go-micro/plugins/v4/transport/quic v1.1.0
+	github.com/go-micro/plugins/v4/transport/rabbitmq v1.1.0
+	github.com/go-micro/plugins/v4/transport/tcp v1.1.0
+	github.com/go-micro/plugins/v4/transport/utp v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/urfave/cli/v2 v2.11.2
 	go-micro.dev/v4 v4.8.1
@@ -33,12 +40,18 @@ require (
 	github.com/Shopify/sarama v1.36.0 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1743 // indirect
+	github.com/anacrolix/missinggo v1.3.0 // indirect
+	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
+	github.com/anacrolix/missinggo/v2 v2.7.0 // indirect
+	github.com/anacrolix/sync v0.4.0 // indirect
+	github.com/anacrolix/utp v0.1.0 // indirect
 	github.com/armon/go-metrics v0.4.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cheekybits/genny v1.0.0 // indirect
 	github.com/clbanning/mxj v1.8.4 // indirect
 	github.com/cloudflare/circl v1.2.0 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
@@ -64,6 +77,7 @@ require (
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
+	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/go-zookeeper/zk v1.0.3 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
@@ -81,7 +95,7 @@ require (
 	github.com/hashicorp/consul/api v1.14.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-hclog v1.2.2 // indirect
+	github.com/hashicorp/go-hclog v1.3.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack v1.1.5 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -91,6 +105,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/memberlist v0.4.0 // indirect
 	github.com/hashicorp/serf v0.10.0 // indirect
+	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/hudl/fargo v1.4.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -104,6 +119,12 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/lucas-clemente/quic-go v0.29.0 // indirect
+	github.com/marten-seemann/qtls-go1-15 v0.1.5 // indirect
+	github.com/marten-seemann/qtls-go1-16 v0.1.5 // indirect
+	github.com/marten-seemann/qtls-go1-17 v0.1.2 // indirect
+	github.com/marten-seemann/qtls-go1-18 v0.1.2 // indirect
+	github.com/marten-seemann/qtls-go1-19 v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
@@ -120,6 +141,7 @@ require (
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
+	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.15.0 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
@@ -146,11 +168,12 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d // indirect
+	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde // indirect
-	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
+	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	golang.org/x/tools v0.1.12 // indirect

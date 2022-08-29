@@ -56,11 +56,10 @@ func (h *Handler) Start() error {
 			}
 
 			for _, s := range services {
-				logger.Info("Found service '%s'", s.Name)
-
 				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
 				resp, err := client.Routes(ctx, &emptypb.Empty{})
 				if err != nil {
+					logger.Error(err)
 					// failure in getting routes, silently ignore
 					continue
 				}
@@ -68,8 +67,6 @@ func (h *Handler) Start() error {
 				serviceGroup := globalGroup.Group(fmt.Sprintf("/%s", resp.GetRouterURI()))
 
 				for _, route := range resp.Routes {
-					logger.Info("Found route for Endpoint %s", route.Endpoint)
-
 					var g *gin.RouterGroup = nil
 
 					if route.IsGlobal {

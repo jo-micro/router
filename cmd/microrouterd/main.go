@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4"
-	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/logger"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +35,6 @@ func main() {
 		micro.Name(config.Name),
 		micro.Version(config.Version),
 		micro.Address(config.GetServerConfig().Address),
-		micro.Client(client.NewClient(client.ContentType("application/json"))),
 		micro.Action(func(c *cli.Context) error {
 			router.Use(gin.Logger(), gin.Recovery())
 
