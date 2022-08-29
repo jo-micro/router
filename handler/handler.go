@@ -52,7 +52,7 @@ func (h *Handler) Start() error {
 			services, err := util.FindByEndpoint(h.service, routerclientpb.RouterClientService.Routes)
 			if err != nil {
 				logger.Error(err)
-				return
+				continue
 			}
 
 			for _, s := range services {
