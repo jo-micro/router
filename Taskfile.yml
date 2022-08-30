@@ -4,7 +4,7 @@ vars:
   GIT_TAG: 
     sh: git tag --points-at HEAD
   GIT_COMMIT:
-    sh: git rev-parse HEAD
+    sh: git rev-parse --short HEAD
   GIT_DIRTY:
     sh: git status -s
   VERSION:
@@ -54,12 +54,15 @@ tasks:
       - task: builder
         vars:
           CLI_ARGS: /bin/sh -c 'cd ./proto/routerclientpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerclientpb.proto'
+      - task: builder
+        vars:
+          CLI_ARGS: /bin/sh -c 'cd ./proto/routerserverpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerserverpb.proto'
 
   build:podman:
     deps:
       - protoc
     cmds:
-      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg=VERSION={{.VERSION}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/go-micro-router/Dockerfile .
+      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg VERSION={{.VERSION}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/go-micro-router/Dockerfile .
     vars:
       DATE:
         sh: date +%s

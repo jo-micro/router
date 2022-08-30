@@ -1,10 +1,12 @@
 package config
 
+var (
+	Version = "0.0.1-dev0"
+)
+
 const (
-	Name      = "go.micro.router"
-	Version   = "0.0.1-dev0"
-	RouterURI = "router"
-	PkgPath   = "github.com/go-micro/router"
+	Name    = "go.micro.router"
+	PkgPath = "github.com/go-micro/router"
 )
 
 const (
@@ -19,6 +21,7 @@ type Config struct {
 type ServerConfig struct {
 	Env            string
 	Address        string
+	RouterURI      string
 	RefreshSeconds int
 }
 

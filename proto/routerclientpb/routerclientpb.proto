@@ -6,7 +6,7 @@ option go_package = "github.com/go-micro/router/proto/routerclientpb;routerclien
 
 import "google/protobuf/empty.proto";
 
-service RouterClient {
+service RouterClientService {
     rpc Routes (google.protobuf.Empty) returns (RoutesReply) {}
 }
 

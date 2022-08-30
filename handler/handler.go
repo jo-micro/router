@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-micro/router/config"
 	"github.com/go-micro/router/proto/routerclientpb"
+	"github.com/go-micro/router/proto/routerserverpb"
 	"github.com/go-micro/router/util"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
@@ -42,20 +43,20 @@ func NewHandler(service micro.Service, engine *gin.Engine) (*Handler, error) {
 
 func (h *Handler) Start() error {
 	globalGroup := h.engine.Group("")
-	globalGroup.Handle("GET", fmt.Sprintf("/%s/routes", config.RouterURI), h.ginRoutes)
 
 	// Refresh routes for the proxy every 10 seconds
 	go func() {
 		ctx := context.Background()
 
 		for {
-			services, err := util.FindByEndpoint(h.service, "RouterClient.Routes")
+			services, err := util.FindByEndpoint(h.service, "RouterClientService.Routes")
 			if err != nil {
 				logger.Error(err)
 				continue
 			}
 
 			for _, s := range services {
+				logger.Debug("Found service ", s.Name)
 				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
 				resp, err := client.Routes(ctx, &emptypb.Empty{})
 				if err != nil {
@@ -67,6 +68,7 @@ func (h *Handler) Start() error {
 				serviceGroup := globalGroup.Group(fmt.Sprintf("/%s", resp.GetRouterURI()))
 
 				for _, route := range resp.Routes {
+					logger.Debug("Found endpoint ", route.Endpoint)
 					var g *gin.RouterGroup = nil
 
 					if route.IsGlobal {
@@ -189,16 +191,15 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 	}
 }
 
-func (h *Handler) ginRoutes(c *gin.Context) {
+func (h *Handler) Routes(ctx context.Context, in *emptypb.Empty, out *routerserverpb.RoutesReply) error {
 	ginRoutes := h.engine.Routes()
-	rRoutes := []JSONRoute{}
+
 	for _, route := range ginRoutes {
-		rRoutes = append(rRoutes, JSONRoute{Method: route.Method, Path: route.Path})
+		out.Routes = append(out.Routes, &routerserverpb.RoutesReply_Route{
+			Method: route.Method,
+			Path:   route.Path,
+		})
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  200,
-		"message": "Dumping the routes",
-		"data":    rRoutes,
-	})
+	return nil
 }

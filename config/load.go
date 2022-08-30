@@ -21,6 +21,7 @@ var _cfg *Config = &Config{
 	Server: ServerConfig{
 		Env:            EnvProd,
 		Address:        ":8080",
+		RouterURI:      "router",
 		RefreshSeconds: 10,
 	},
 }

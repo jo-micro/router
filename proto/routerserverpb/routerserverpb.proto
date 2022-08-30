@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package routerserverpb;
+
+option go_package = "github.com/go-micro/router/proto/routerserverpb;routerserverpb";
+
+import "google/protobuf/empty.proto";
+
+service RouterServerService {
+    rpc Routes (google.protobuf.Empty) returns (RoutesReply) {}
+}
+
+message RoutesReply {
+    message Route {
+        string method = 1;
+        string path = 2;
+    }
+
+    repeated Route routes = 1;
+}
