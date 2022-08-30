@@ -2,8 +2,7 @@
 
 A dynamic router (API Gatway) for go-micro.
 
-It looks for services that host "proto/routerclientpb/routerclientpb.RouterClient" and ask's them for routes/endpoints,
-then it registers that endpoints via a proxy method within gin.
+It looks for services that host "proto/routerclientpb/routerclientpb.RouterClientService" and ask's them for routes/endpoints, then it registers that endpoints via a proxy method within gin.
 
 ## Caveats
 
@@ -11,12 +10,12 @@ then it registers that endpoints via a proxy method within gin.
 
 ## Todo
 
-- Add examples.
+- Add (more) examples.
 - Add support for Streams / WebSockets.
 - Add support for [debug](https://github.com/asim/go-micro/tree/master/debug).
 - Maybe add optional support for [auth](https://github.com/asim/go-micro/blob/master/auth/auth.go).
 
-## Example
+## Examples
 
 For now you have to look at [internalService](https://github.com/go-micro/router/blob/master/cmd/microrouterd/main.go#L20) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
 
