@@ -18,7 +18,7 @@ then it registers that endpoints via a proxy method within gin.
 
 ## Example
 
-For now you have to look at [internalService](https://github.com/pcdummy/go-micro-router/blob/master/cmd/microrouterd/main.go#L20) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
+For now you have to look at [internalService](https://github.com/go-micro/router/blob/master/cmd/microrouterd/main.go#L20) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
 
 ## Build podman/docker image
 
