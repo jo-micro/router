@@ -23,8 +23,8 @@ Here some code from the microlobby project
 ```go
 import (
 	"github.com/go-micro/router"
-    "github.com/urfave/cli/v2"
-    "go-micro.dev/v4"
+	"github.com/urfave/cli/v2"
+	"go-micro.dev/v4"
 	"wz2100.net/microlobby/shared/proto/authservicepb/v1"
 )
 
@@ -32,8 +32,8 @@ func main() {
 	service := micro.NewService()
 
 	service.Init(
-        micro.Action(func(c *cli.Context) error {
-            s := service.Server()
+		micro.Action(func(c *cli.Context) error {
+			s := service.Server()
 			r := router.NewHandler(
 				config.RouterURI,
 				router.NewRoute(
@@ -77,8 +77,8 @@ func main() {
 				),
 			)
 			r.RegisterWithServer(s)
-        }
-    )
+		}
+	)
 }
 ```
 
