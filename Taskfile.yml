@@ -53,10 +53,10 @@ tasks:
     cmds:
       - task: builder
         vars:
-          CLI_ARGS: /bin/sh -c 'cd ./proto/routerclientpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerclientpb.proto'
+          CLI_ARGS: /bin/sh -c 'cd ./internal/proto/routerclientpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerclientpb.proto'
       - task: builder
         vars:
-          CLI_ARGS: /bin/sh -c 'cd ./proto/routerserverpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerserverpb.proto'
+          CLI_ARGS: /bin/sh -c 'cd ./internal/proto/routerserverpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerserverpb.proto'
 
   build:podman:
     deps:

@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-micro/plugins/v4/config/encoder/toml"
 	"github.com/go-micro/plugins/v4/config/encoder/yaml"
-	"github.com/go-micro/router/util"
+	"github.com/go-micro/router/internal/util"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4/config"
 	"go-micro.dev/v4/config/reader"

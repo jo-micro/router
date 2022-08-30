@@ -3,8 +3,9 @@ package router
 import (
 	"context"
 
-	"github.com/go-micro/router/proto/routerclientpb"
-	"github.com/go-micro/router/util"
+	"github.com/go-micro/router/internal/proto/routerclientpb"
+	"github.com/go-micro/router/internal/util"
+	"go-micro.dev/v4/server"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -28,6 +29,11 @@ func NewHandler(routerURI string, routes ...Route) *Handler {
 	}
 
 	return &Handler{routerURI, pbRoutes}
+}
+
+// RegisterWithServer registers this Handler with a server
+func (h *Handler) RegisterWithServer(s server.Server) {
+	routerclientpb.RegisterRouterClientServiceHandler(s, h)
 }
 
 // Routes returns the registered routes

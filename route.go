@@ -11,9 +11,9 @@ type Route struct {
 	Params   []string
 }
 
-type RouteOption func(*Route)
+type Option func(*Route)
 
-func NewRoute(endpoint interface{}, opts ...RouteOption) Route {
+func NewRoute(endpoint interface{}, opts ...Option) Route {
 	route := Route{
 		IsGlobal: false,
 		Method:   http.MethodGet,
@@ -29,31 +29,31 @@ func NewRoute(endpoint interface{}, opts ...RouteOption) Route {
 	return route
 }
 
-func RouteIsGlobal(n bool) RouteOption {
+func IsGlobal(n bool) Option {
 	return func(o *Route) {
 		o.IsGlobal = n
 	}
 }
 
-func RouteMethod(n string) RouteOption {
+func Method(n string) Option {
 	return func(o *Route) {
 		o.Method = n
 	}
 }
 
-func RoutePath(n string) RouteOption {
+func Path(n string) Option {
 	return func(o *Route) {
 		o.Path = n
 	}
 }
 
-func RouteEndpoint(n interface{}) RouteOption {
+func Endpoint(n interface{}) Option {
 	return func(o *Route) {
 		o.Endpoint = n
 	}
 }
 
-func RouteParams(n []string) RouteOption {
+func Params(n ...string) Option {
 	return func(o *Route) {
 		o.Params = n
 	}

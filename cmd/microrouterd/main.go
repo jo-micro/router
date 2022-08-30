@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
@@ -11,10 +9,9 @@ import (
 	httpServer "github.com/go-micro/plugins/v4/server/http"
 	"github.com/go-micro/router"
 
-	"github.com/go-micro/router/config"
-	"github.com/go-micro/router/handler"
-	"github.com/go-micro/router/proto/routerclientpb"
-	"github.com/go-micro/router/proto/routerserverpb"
+	"github.com/go-micro/router/internal/config"
+	"github.com/go-micro/router/internal/handler"
+	"github.com/go-micro/router/internal/proto/routerserverpb"
 )
 
 func internalService(engine *gin.Engine) {
@@ -35,15 +32,15 @@ func internalService(engine *gin.Engine) {
 
 			routerserverpb.RegisterRouterServerServiceHandler(srv.Server(), routerHandler)
 
-			routerHandler := router.NewHandler(
+			r := router.NewHandler(
 				config.GetServerConfig().RouterURI,
 				router.NewRoute(
-					router.RouteMethod(http.MethodGet),
-					router.RoutePath("/routes"),
-					router.RouteEndpoint(routerserverpb.RouterServerService.Routes),
+					router.Method(router.MethodGet),
+					router.Path("/routes"),
+					router.Endpoint(routerserverpb.RouterServerService.Routes),
 				),
 			)
-			routerclientpb.RegisterRouterClientServiceHandler(srv.Server(), routerHandler)
+			r.RegisterWithServer(srv.Server())
 
 			return nil
 		}),

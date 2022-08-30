@@ -5,15 +5,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-micro/router/config"
-	"github.com/go-micro/router/proto/routerclientpb"
-	"github.com/go-micro/router/proto/routerserverpb"
-	"github.com/go-micro/router/util"
+	"github.com/go-micro/router/internal/config"
+	"github.com/go-micro/router/internal/proto/routerclientpb"
+	"github.com/go-micro/router/internal/proto/routerserverpb"
+	"github.com/go-micro/router/internal/util"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
@@ -123,7 +123,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 						if err != nil {
 							continue
 						}
-						data, err := ioutil.ReadAll(fp)
+						data, err := io.ReadAll(fp)
 						if err != nil {
 							continue
 						}
