@@ -81,13 +81,13 @@ tasks:
       - task: build:podman
       - task: tag:podman
 
-  publish:
-    desc: Publish images to docker.io, this requires the current commit to be a git tag
+  release:
+    desc: Release images to docker.io, this requires the current commit to be a git tag
     deps:
       - podman
     cmds:
-      - podman publish docker.io/pcdummy/go-micro-router:latest
-      - podman publish docker.io/pcdummy/go-micro-router:{{.GIT_TAG}}
+      - podman push docker.io/pcdummy/go-micro-router:latest
+      - podman push docker.io/pcdummy/go-micro-router:{{.GIT_TAG}}
     status:
       - test "{{.VERSION}}" != "{{.GIT_TAG}}"
 
