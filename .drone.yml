@@ -34,8 +34,8 @@ steps:
     username: robot$jo-micro+drone
     password: 
       from_secret: registry.fk.jochum.dev-robot
-    dockerfile: ./docker/builder/Dockerfile
-    context: ./docker/builder/
+    dockerfile: ./docker/router/Dockerfile
+    context: ./docker/router/
     repo: registry.fk.jochum.dev/jo-micro/router
     build_args:
     - VERSION=${DRONE_TAG:1}
