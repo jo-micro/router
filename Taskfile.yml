@@ -13,17 +13,16 @@ vars:
 tasks:
   default:
     cmds: 
-      - task: volume
       - task: podman
 
   version:
     cmds:
       - echo "{{.VERSION}}"
 
-  volume:
-    run: "once"
+  builder:
+    desc: Run something in the builder container for example "task builder -- go get -u ./..."
     cmds:
-      - podman volume inspect micro_router_go 1>/dev/null 2>&1 || podman volume create micro_router_go
+      - podman run --rm registry.fk.jochum.dev/jo-micro/builder:latest {{.CLI_ARGS}}
 
   protoc:
     desc: Generate protobruf go files
@@ -38,10 +37,7 @@ tasks:
     deps:
       - protoc
     cmds:
-      - podman build -v "{{.VOLUME_PATH}}:/go:rw" --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
-    vars:
-      VOLUME_PATH:
-        sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
+      - podman build --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
   
   podman:
     desc: Generate docker container for go-micro-router tagged as registry.fk.jochum.dev/jo-micro/router:latest and :GIT_TAG if theres a tag
@@ -66,5 +62,4 @@ tasks:
     desc: Remove all persistent data
     cmds:
       - podman image rm registry.fk.jochum.dev/jo-micro/router:latest || exit 0
-      - podman volume rm micro_router_go || exit 0
       - rm -rf $PWD/.task
