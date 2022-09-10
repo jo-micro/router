@@ -1,4 +1,4 @@
-module github.com/go-micro/router
+module git.jochum.dev/jo-micro/router
 
 go 1.19
 

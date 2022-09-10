@@ -1,6 +1,6 @@
 SPDXVersion: SPDX-2.1
 DataLicense: CC0-1.0
 Creator: René Jochum (rene@jochum.dev)
-PackageName: github.com/go-micro/router
+PackageName: git.jochum.dev/jo-micro/router
 PackageOriginator: René Jochum
 PackageLicenseDeclared: Apache-2.0 OR GPL-2.0-or-later

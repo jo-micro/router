@@ -13,7 +13,7 @@ ENV GOPATH="/go"
 
 ARG CACHEBUST=1
 ARG VERSION
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -installsuffix cgo -ldflags="-w -s -X 'github.com/go-micro/router/internal/config.Version=$VERSION'" -o /usr/local/bin/microrouterd github.com/go-micro/router/cmd/microrouterd
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -installsuffix cgo -ldflags="-w -s -X 'git.jochum.dev/jo-micro/router/internal/config.Version=$VERSION'" -o /usr/local/bin/microrouterd git.jochum.dev/jo-micro/router/cmd/microrouterd
 
 # STEP 2 build a small image
 # start from busybox

@@ -17,12 +17,12 @@ It looks for services that host "proto/routerclientpb/routerclientpb.RouterClien
 
 ## Examples
 
-Have a look at [internalService](https://github.com/go-micro/router/blob/master/cmd/microrouterd/main.go#L35) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
+Have a look at [internalService](https://git.jochum.dev/jo-micro/router/blob/master/cmd/microrouterd/main.go#L35) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
 
 Here's some code from the microlobby project
 ```go
 import (
-	"github.com/go-micro/router"
+	"git.jochum.dev/jo-micro/router"
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4"
 	"wz2100.net/microlobby/shared/proto/authservicepb/v1"

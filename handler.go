@@ -3,13 +3,13 @@ package router
 import (
 	"context"
 
-	"github.com/go-micro/router/internal/proto/routerclientpb"
-	"github.com/go-micro/router/internal/util"
+	"git.jochum.dev/jo-micro/router/internal/proto/routerclientpb"
+	"git.jochum.dev/jo-micro/router/internal/util"
 	"go-micro.dev/v4/server"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// Handler is the handler for github.com/go-micro/router/proto/routerpb.RrouterService
+// Handler is the handler for git.jochum.dev/jo-micro/router/proto/routerpb.RrouterService
 type Handler struct {
 	routerURI string
 	routes    []*routerclientpb.RoutesReply_Route
