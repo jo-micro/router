@@ -6,7 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-micro/plugins/v4/broker/kafka v1.1.0
 	github.com/go-micro/plugins/v4/broker/mqtt v1.1.0
-	github.com/go-micro/plugins/v4/broker/nats v1.1.0
+	github.com/go-micro/plugins/v4/broker/nats v1.1.1-0.20220908125827-e0369dde429b
 	github.com/go-micro/plugins/v4/broker/rabbitmq v1.1.0
 	github.com/go-micro/plugins/v4/broker/redis v1.1.0
 	github.com/go-micro/plugins/v4/config/encoder/toml v1.1.0
@@ -17,18 +17,18 @@ require (
 	github.com/go-micro/plugins/v4/registry/gossip v1.1.0
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0
 	github.com/go-micro/plugins/v4/registry/nacos v1.1.0
-	github.com/go-micro/plugins/v4/registry/nats v1.1.0
+	github.com/go-micro/plugins/v4/registry/nats v1.1.1-0.20220908125827-e0369dde429b
 	github.com/go-micro/plugins/v4/registry/zookeeper v1.1.0
 	github.com/go-micro/plugins/v4/server/http v1.1.0
 	github.com/go-micro/plugins/v4/transport/grpc v1.1.0
 	github.com/go-micro/plugins/v4/transport/http v1.1.0
-	github.com/go-micro/plugins/v4/transport/nats v1.1.0
+	github.com/go-micro/plugins/v4/transport/nats v1.1.1-0.20220908125827-e0369dde429b
 	github.com/go-micro/plugins/v4/transport/quic v1.1.0
 	github.com/go-micro/plugins/v4/transport/rabbitmq v1.1.0
 	github.com/go-micro/plugins/v4/transport/tcp v1.1.0
 	github.com/go-micro/plugins/v4/transport/utp v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/urfave/cli/v2 v2.11.2
+	github.com/urfave/cli/v2 v2.14.0
 	go-micro.dev/v4 v4.8.1
 	google.golang.org/protobuf v1.28.1
 )
@@ -167,7 +167,7 @@ require (
 	go.uber.org/goleak v1.1.12 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
-	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d // indirect
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect

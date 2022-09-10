@@ -241,6 +241,8 @@ github.com/go-micro/plugins/v4/broker/mqtt v1.1.0 h1:V6Munhx6YAlABtHX6idMOvX/txg
 github.com/go-micro/plugins/v4/broker/mqtt v1.1.0/go.mod h1:0M0V1hB5+TxSAuXhGqZ3VMc+OIqlSdxgwEH+08Rgk00=
 github.com/go-micro/plugins/v4/broker/nats v1.1.0 h1:JCo2JksH0M6HC8q8L+x9QCqGRr5M0BADQw2Q50TWCas=
 github.com/go-micro/plugins/v4/broker/nats v1.1.0/go.mod h1:qfrgRHN39JMwkml/50LD2zWkHoEAROX5kNJd12Nll9c=
+github.com/go-micro/plugins/v4/broker/nats v1.1.1-0.20220908125827-e0369dde429b h1:hzQUmqhw+g+qEcMXfZFCR28ASgjnFTbI24KJFSk7+4Y=
+github.com/go-micro/plugins/v4/broker/nats v1.1.1-0.20220908125827-e0369dde429b/go.mod h1:dJ5fMD5/7rK1/DNtyWzI/5kGtjYzB1DwMlANr7b2ar4=
 github.com/go-micro/plugins/v4/broker/rabbitmq v1.1.0 h1:OsiMI4ru+J5J2L7Hm8SH5cJovKZF2l5NKCPVqikAZ08=
 github.com/go-micro/plugins/v4/broker/rabbitmq v1.1.0/go.mod h1:17HbVUfyh1SgCEI3HKdnSskql9a7EXW3xYuaXzEmLgk=
 github.com/go-micro/plugins/v4/broker/redis v1.1.0 h1:iY4z34UxLSk6bw2urSEPFFeNE3By8DSsMENSP40kwV8=
@@ -263,6 +265,8 @@ github.com/go-micro/plugins/v4/registry/nacos v1.1.0 h1:fT1CqArfcBsvYBki1X0aUSjt
 github.com/go-micro/plugins/v4/registry/nacos v1.1.0/go.mod h1:QQYUURaeGF9SwxLT3ux9Obj8GOb2YAqXaF7UVv97FD0=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0 h1:oqQzP5P2FkfoYZiBRuCWsKqh4BCJG6MQkxYmLw2lNrU=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0/go.mod h1:4tTfa958PiYUOZNBBNoY1awmgfxFcqQOmix8cR3UM+E=
+github.com/go-micro/plugins/v4/registry/nats v1.1.1-0.20220908125827-e0369dde429b h1:9XdSUFJq2pR3QQquzpjiyHRBzHahvmQrwATzBtIyM2w=
+github.com/go-micro/plugins/v4/registry/nats v1.1.1-0.20220908125827-e0369dde429b/go.mod h1:WdofRVBX8dt+b7J01JpryfAZ3HDD3JDs5t0NXWmBVmI=
 github.com/go-micro/plugins/v4/registry/zookeeper v1.1.0 h1:gRqywFyj1eENmyXQVwyLpr5nQ4LjEubnFCRJhQ7YHnc=
 github.com/go-micro/plugins/v4/registry/zookeeper v1.1.0/go.mod h1:7i/z3MuIJJvlo4ic0v0jVJu90mcC/T9Tykzh+HL6Ik8=
 github.com/go-micro/plugins/v4/server/http v1.1.0 h1:3zigMm74qsuGJDMHCuYFy+2PEvnKND3S5AcabuWWyr8=
@@ -273,6 +277,8 @@ github.com/go-micro/plugins/v4/transport/http v1.1.0 h1:yQPuhDExEVBxrN1K3bxX1kmg
 github.com/go-micro/plugins/v4/transport/http v1.1.0/go.mod h1:bR/x3uga0+PNIR8bMWFjyEY8/f1IvKWVd/ctPm+NJxI=
 github.com/go-micro/plugins/v4/transport/nats v1.1.0 h1:04Gd/EcvqMydLXe/LmfWey2fYfkbZumG7as4ocdU2r4=
 github.com/go-micro/plugins/v4/transport/nats v1.1.0/go.mod h1:tCqq6Nvda4DACDdfuKoY36P2FUGaMvQFMcSScXv1//A=
+github.com/go-micro/plugins/v4/transport/nats v1.1.1-0.20220908125827-e0369dde429b h1:JhY/Le8oAnNpV9k19zkAziU7c2JRbvcGL3c4oT1Qu2o=
+github.com/go-micro/plugins/v4/transport/nats v1.1.1-0.20220908125827-e0369dde429b/go.mod h1:V241pJ//Xf5x9kyfQbEK7pf5ivH7vPEZRGRAcVCRVG0=
 github.com/go-micro/plugins/v4/transport/quic v1.1.0 h1:TuOhOF1ihh2r6bENF+WEOEsztwKuJ5ftsh2VaGsj6KE=
 github.com/go-micro/plugins/v4/transport/quic v1.1.0/go.mod h1:3uktyljxlvl+Iuq419lL0osvXXrHyEvSrXWqsjMdi1A=
 github.com/go-micro/plugins/v4/transport/rabbitmq v1.1.0 h1:kTlEbsIelDb0Ab8kHVlDcgh+KmCbUNOanTQ7SceAaR0=
@@ -731,6 +737,8 @@ github.com/ugorji/go/codec v1.2.7/go.mod h1:WGN1fab3R1fzQlVQTkfxVtIBhWDRqOviHU95
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/urfave/cli/v2 v2.11.2 h1:FVfNg4m3vbjbBpLYxW//WjxUoHvJ9TlppXcqY9Q9ZfA=
 github.com/urfave/cli/v2 v2.11.2/go.mod h1:f8iq5LtQ/bLxafbdBSLPPNsgaW0l/2fYYEHhAyPlwvo=
+github.com/urfave/cli/v2 v2.14.0 h1:sFRL29Dm9JhXSMYb96raDeo/Q/JRyPXPs8u+4CkMlI8=
+github.com/urfave/cli/v2 v2.14.0/go.mod h1:1CNUng3PtjQMtRzJO4FMXBQvkGtuYRxxiR9xMa7jMwI=
 github.com/willf/bitset v1.1.9/go.mod h1:RjeCKbqT1RxIR/KWY6phxZiaY1IyutSBfGjNPySAYV4=
 github.com/willf/bitset v1.1.10/go.mod h1:RjeCKbqT1RxIR/KWY6phxZiaY1IyutSBfGjNPySAYV4=
 github.com/xanzy/ssh-agent v0.3.0/go.mod h1:3s9xbODqPuuhK9JV1R321M/FlMZSBvE5aY6eAcqrDh0=
@@ -795,6 +803,8 @@ golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d/go.mod h1:IxCIyHEi3zRg3s0
 golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d h1:3qF+Z8Hkrw9sOhrFHti9TlB1Hkac1x+DNRkv0XQiFjo=
 golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
+golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 h1:Y/gsMcFOcR+6S6f3YeMKl5g+dZMEWqcz5Czj/GWYbkM=
+golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/exp v0.0.0-20190121172915-509febef88a4/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20190306152737-a1d7652674e8/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
 golang.org/x/exp v0.0.0-20190510132918-efd6b22b2522/go.mod h1:ZjyILWgesfNpC6sMxTJOJm9Kp84zZh5NQWvqDGG3Qr8=
