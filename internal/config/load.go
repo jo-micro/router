@@ -16,18 +16,8 @@ import (
 	"jochum.dev/jo-micro/router/internal/util"
 )
 
-// internal instance of Config
-var _cfg *Config = &Config{
-	Router: RouterConfig{
-		Env:            EnvProd,
-		Address:        ":8080",
-		RouterURI:      "router",
-		RefreshSeconds: 10,
-	},
-}
-
 // Load will load configurations and update it when changed
-func Load() error {
+func Load(cfg interface{}) error {
 	var configor config.Config
 	var err error
 	switch strings.ToLower(os.Getenv("CONFIG_TYPE")) {
@@ -60,9 +50,10 @@ func Load() error {
 	if err := configor.Load(); err != nil {
 		return errors.Wrap(err, "configor.Load")
 	}
-	if err := configor.Scan(_cfg); err != nil {
+	if err := configor.Scan(cfg); err != nil {
 		return errors.Wrap(err, "configor.Scan")
 	}
+
 	w, err := configor.Watch()
 	if err != nil {
 		return errors.Wrap(err, "configor.Watch")
@@ -74,7 +65,7 @@ func Load() error {
 				logger.Error(err)
 				return
 			}
-			if err := v.Scan(_cfg); err != nil {
+			if err := v.Scan(cfg); err != nil {
 				logger.Error(err)
 				return
 			}

@@ -9,8 +9,9 @@ import (
 	httpServer "github.com/go-micro/plugins/v4/server/http"
 	"jochum.dev/jo-micro/router"
 
-	"jochum.dev/jo-micro/router/internal/config"
-	"jochum.dev/jo-micro/router/internal/handler"
+	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
+	"jochum.dev/jo-micro/router/cmd/microrouterd/handler"
+	iConfig "jochum.dev/jo-micro/router/internal/config"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 )
 
@@ -64,7 +65,7 @@ func main() {
 		micro.Server(httpServer.NewServer()),
 	)
 
-	if err := config.Load(); err != nil {
+	if err := iConfig.Load(config.GetConfig()); err != nil {
 		logger.Fatal(err)
 	}
 
