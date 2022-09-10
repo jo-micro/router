@@ -66,27 +66,10 @@ tasks:
       VOLUME_PATH:
         sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
   
-  tag:podman:
-    cmds:
-      - podman tag registry.fk.jochum.dev/jo-micro/router:latest registry.fk.jochum.dev/jo-micro/router:{{.GIT_TAG}}
-    status:
-      - test "{{.VERSION}}" != "{{.GIT_TAG}}"
-
   podman:
     desc: Generate docker container for go-micro-router tagged as registry.fk.jochum.dev/jo-micro/router:latest and :GIT_TAG if theres a tag
     cmds:
       - task: build:podman
-      - task: tag:podman
-
-  release:
-    desc: Release images to docker.io, this requires the current commit to be a git tag
-    deps:
-      - podman
-    cmds:
-      - podman push registry.fk.jochum.dev/jo-micro/router:latest
-      - podman push registry.fk.jochum.dev/jo-micro/router:{{.GIT_TAG}}
-    status:
-      - test "{{.VERSION}}" != "{{.GIT_TAG}}"
 
   tidy:
     desc: Run "go mod tidy" in a container

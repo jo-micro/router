@@ -1,0 +1,42 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+trigger:
+  event:
+  - cron
+  - custom
+  - tag
+
+steps:
+- name: build-builder
+  image: plugins/docker
+  settings:
+    registry: registry.fk.jochum.dev
+    username: robot$jo-micro+drone
+    password: 
+      from_secret: registry.fk.jochum.dev-robot
+    dockerfile: ./docker/builder/Dockerfile
+    context: ./docker/builder/
+    repo: registry.fk.jochum.dev/jo-micro/router-builder
+    tags: 
+    - latest
+
+- name: build-router
+  image: plugins/docker
+  settings:
+    registry: registry.fk.jochum.dev
+    username: robot$jo-micro+drone
+    password: 
+      from_secret: registry.fk.jochum.dev-robot
+    dockerfile: ./docker/builder/Dockerfile
+    context: ./docker/builder/
+    repo: registry.fk.jochum.dev/jo-micro/router
+    build_args:
+    - VERSION=${DRONE_TAG:1}
+    auto_tag: true
