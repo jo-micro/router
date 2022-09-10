@@ -1,18 +1,18 @@
 # STEP 1 build executable binary
-FROM registry.fk.jochum.dev/jo-micro/router-builder:latest AS builder
+FROM registry.fk.jochum.dev/jo-micro/builder:latest AS builder
 
 # Create appuser (/etc/passwd entry for the runner container)
 RUN useradd appuser
 
-VOLUME [ "/go", "/code" ]
+VOLUME [ "/go" ]
 
 WORKDIR /code
 
 # RUN go mod download
 ENV GOPATH="/go"
 
-ARG CACHEBUST=1
 ARG VERSION
+COPY . /code/
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -installsuffix cgo -ldflags="-w -s -X 'jochum.dev/jo-micro/router/internal/config.Version=$VERSION'" -o /usr/local/bin/microrouterd jochum.dev/jo-micro/router/cmd/microrouterd
 
 # STEP 2 build a small image

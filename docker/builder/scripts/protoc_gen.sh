@@ -1,2 +1,0 @@
-#!/bin/sh
-find . -name '*.proto' -print0 | xargs -0 -I {} /bin/sh -c 'cd $(dirname $1); PATH=$PATH:/go/bin protoc --micro_out=paths=source_relative:. --go_out=paths=source_relative:. $(basename $1)' '_' '{}'

@@ -25,27 +25,6 @@ tasks:
     cmds:
       - podman volume inspect micro_router_go 1>/dev/null 2>&1 || podman volume create micro_router_go
 
-  build:builder:
-    deps: 
-      - volume
-    cmds: 
-      - podman build -v "{{.VOLUME_PATH}}:/go:rw" -t registry.fk.jochum.dev/jo-micro/router-builder:latest -f ./docker/builder/Dockerfile ./docker/builder/
-    sources:
-      - ./docker/builder/**/*
-    vars:
-      VOLUME_PATH:
-        sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
-
-  builder:
-    desc: Run something in the builder container for example "task builder -- go get -u ./..."
-    deps:
-      - build:builder
-    cmds:
-      - podman run --rm -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" registry.fk.jochum.dev/jo-micro/router-builder:latest {{.CLI_ARGS}}
-    vars:
-      VOLUME_PATH:
-        sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
-
   protoc:
     desc: Generate protobruf go files
     sources:
@@ -59,10 +38,8 @@ tasks:
     deps:
       - protoc
     cmds:
-      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
+      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
     vars:
-      DATE:
-        sh: date +%s
       VOLUME_PATH:
         sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
   
@@ -88,8 +65,6 @@ tasks:
   rm:
     desc: Remove all persistent data
     cmds:
-      - podman image rm registry.fk.jochum.dev/jo-micro/router-builder:latest || exit 0
-      # Don't delete the result
-      # - podman image rm registry.fk.jochum.dev/jo-micro/router:latest || exit 0
+      - podman image rm registry.fk.jochum.dev/jo-micro/router:latest || exit 0
       - podman volume rm micro_router_go || exit 0
       - rm -rf $PWD/.task

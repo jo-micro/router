@@ -98,7 +98,7 @@ func main() {
 task
 ```
 
-#### Remove everything except the resulting podman images created by task
+#### Remove everything
 
 ```bash
 task rm
