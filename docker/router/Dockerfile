@@ -1,5 +1,5 @@
 # STEP 1 build executable binary
-FROM docker.io/pcdummy/go-micro-router-builder:latest AS builder
+FROM registry.fk.jochum.dev/jo-micro/router-builder:latest AS builder
 
 # Create appuser (/etc/passwd entry for the runner container)
 RUN useradd appuser

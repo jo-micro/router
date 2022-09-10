@@ -1,4 +1,4 @@
-FROM golang:1.19
+FROM registry.fk.jochum.dev/docker_hub_cache/library/golang:1.19
 
 # Install packages
 RUN apt-get update --allow-releaseinfo-change && \

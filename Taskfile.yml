@@ -29,7 +29,7 @@ tasks:
     deps: 
       - volume
     cmds: 
-      - podman build -v "{{.VOLUME_PATH}}:/go:rw" -t docker.io/pcdummy/go-micro-router-builder:latest -f ./docker/builder/Dockerfile ./docker/builder/
+      - podman build -v "{{.VOLUME_PATH}}:/go:rw" -t registry.fk.jochum.dev/jo-micro/router-builder:latest -f ./docker/builder/Dockerfile ./docker/builder/
     sources:
       - ./docker/builder/**/*
     vars:
@@ -41,7 +41,7 @@ tasks:
     deps:
       - build:builder
     cmds:
-      - podman run --rm -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" docker.io/pcdummy/go-micro-router-builder:latest {{.CLI_ARGS}}
+      - podman run --rm -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" registry.fk.jochum.dev/jo-micro/router-builder:latest {{.CLI_ARGS}}
     vars:
       VOLUME_PATH:
         sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
@@ -59,7 +59,7 @@ tasks:
     deps:
       - protoc
     cmds:
-      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg VERSION={{.VERSION}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/router/Dockerfile .
+      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
     vars:
       DATE:
         sh: date +%s
@@ -68,12 +68,12 @@ tasks:
   
   tag:podman:
     cmds:
-      - podman tag docker.io/pcdummy/go-micro-router:latest docker.io/pcdummy/go-micro-router:{{.GIT_TAG}}
+      - podman tag registry.fk.jochum.dev/jo-micro/router:latest registry.fk.jochum.dev/jo-micro/router:{{.GIT_TAG}}
     status:
       - test "{{.VERSION}}" != "{{.GIT_TAG}}"
 
   podman:
-    desc: Generate docker container for go-micro-router tagged as docker.io/pcdummy/go-micro-router:latest and :GIT_TAG if theres a tag
+    desc: Generate docker container for go-micro-router tagged as registry.fk.jochum.dev/jo-micro/router:latest and :GIT_TAG if theres a tag
     cmds:
       - task: build:podman
       - task: tag:podman
@@ -83,8 +83,8 @@ tasks:
     deps:
       - podman
     cmds:
-      - podman push docker.io/pcdummy/go-micro-router:latest
-      - podman push docker.io/pcdummy/go-micro-router:{{.GIT_TAG}}
+      - podman push registry.fk.jochum.dev/jo-micro/router:latest
+      - podman push registry.fk.jochum.dev/jo-micro/router:{{.GIT_TAG}}
     status:
       - test "{{.VERSION}}" != "{{.GIT_TAG}}"
 
@@ -105,8 +105,8 @@ tasks:
   rm:
     desc: Remove all persistent data
     cmds:
-      - podman image rm docker.io/pcdummy/go-micro-router-builder:latest || exit 0
+      - podman image rm registry.fk.jochum.dev/jo-micro/router-builder:latest || exit 0
       # Don't delete the result
-      # - podman image rm docker.io/pcdummy/go-micro-router:latest || exit 0
+      # - podman image rm registry.fk.jochum.dev/jo-micro/router:latest || exit 0
       - podman volume rm micro_router_go || exit 0
       - rm -rf $PWD/.task
