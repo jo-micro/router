@@ -11,6 +11,7 @@ require (
 	github.com/go-micro/plugins/v4/broker/redis v1.1.0
 	github.com/go-micro/plugins/v4/config/encoder/toml v1.1.0
 	github.com/go-micro/plugins/v4/config/encoder/yaml v1.1.0
+	github.com/go-micro/plugins/v4/logger/logrus v1.1.0
 	github.com/go-micro/plugins/v4/registry/consul v1.1.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.1.0
 	github.com/go-micro/plugins/v4/registry/eureka v1.1.0
@@ -27,6 +28,8 @@ require (
 	github.com/go-micro/plugins/v4/transport/tcp v1.1.0
 	github.com/go-micro/plugins/v4/transport/utp v1.1.0
 	github.com/pkg/errors v0.9.1
+	github.com/sirupsen/logrus v1.9.0
+	github.com/toorop/gin-logrus v0.0.0-20210225092905-2c785434f26f
 	github.com/urfave/cli/v2 v2.15.0
 	go-micro.dev/v4 v4.8.1
 	google.golang.org/protobuf v1.28.1
@@ -137,7 +140,7 @@ require (
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
-	github.com/pierrec/lz4/v4 v4.1.15 // indirect
+	github.com/pierrec/lz4/v4 v4.1.16 // indirect
 	github.com/prometheus/client_golang v1.13.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect

@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+
+	ginlogrus "github.com/toorop/gin-logrus"
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
@@ -12,6 +15,7 @@ import (
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
 	"jochum.dev/jo-micro/router/cmd/microrouterd/handler"
 	iConfig "jochum.dev/jo-micro/router/internal/config"
+	iLogger "jochum.dev/jo-micro/router/internal/logger"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 )
 
@@ -78,8 +82,15 @@ func main() {
 		micro.Name(config.Name),
 		micro.Version(config.Version),
 		micro.Address(config.GetRouterConfig().Address),
+		micro.Flags(iLogger.Flags()...),
 		micro.Action(func(c *cli.Context) error {
-			r.Use(gin.Logger(), gin.Recovery())
+			// Start the logger
+			if err := iLogger.Start(c); err != nil {
+				log.Fatal(err)
+				return err
+			}
+
+			r.Use(ginlogrus.Logger(iLogger.Logrus()), gin.Recovery())
 
 			if err := micro.RegisterHandler(srv.Server(), r); err != nil {
 				logger.Fatal(err)
@@ -94,6 +105,11 @@ func main() {
 
 	// Run server
 	if err := srv.Run(); err != nil {
+		logger.Fatal(err)
+	}
+
+	// Stop the logger
+	if err := iLogger.Stop(); err != nil {
 		logger.Fatal(err)
 	}
 }

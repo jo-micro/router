@@ -9,6 +9,8 @@ vars:
     sh: git status -s
   VERSION:
     sh: if test "{{.GIT_DIRTY}}" != ""; then echo "{{.GIT_COMMIT}}-dirty"; elif test "{{.GIT_TAG}}" != ""; then echo "{{.GIT_TAG}}"; else echo "{{.GIT_COMMIT}}"; fi
+  PWD:
+    sh: echo $PWD
 
 tasks:
   default:
@@ -30,7 +32,7 @@ tasks:
   builder:
     desc: Run something in the builder container for example "task builder -- go get -u ./..."
     cmds:
-      - podman run --rm -v "$PWD:/code" registry.fk.jochum.dev/jo-micro/builder:latest {{.CLI_ARGS}}
+      - podman run --rm -v "{{.PWD}}:/code" -v "{{.VOLUME_PATH}}:/go:rw" registry.fk.jochum.dev/jo-micro/builder:latest {{.CLI_ARGS}}
     vars:
       VOLUME_PATH:
         sh: podman volume inspect jo_micro-router_go --format "{{"{{"}}.Mountpoint{{"}}"}}"
@@ -49,7 +51,7 @@ tasks:
     deps:
       - protoc
     cmds:
-      - podman build --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
+      - podman build -v "{{.VOLUME_PATH}}:/go:rw" --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
     vars:
       VOLUME_PATH:
         sh: podman volume inspect jo_micro-router_go --format "{{"{{"}}.Mountpoint{{"}}"}}"
