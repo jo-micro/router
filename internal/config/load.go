@@ -18,7 +18,7 @@ import (
 
 // internal instance of Config
 var _cfg *Config = &Config{
-	Server: ServerConfig{
+	Router: RouterConfig{
 		Env:            EnvProd,
 		Address:        ":8080",
 		RouterURI:      "router",

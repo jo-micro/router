@@ -33,7 +33,7 @@ func internalService(engine *gin.Engine) {
 			routerserverpb.RegisterRouterServerServiceHandler(srv.Server(), routerHandler)
 
 			r := router.NewHandler(
-				config.GetServerConfig().RouterURI,
+				config.GetRouterConfig().RouterURI,
 				router.NewRoute(
 					router.Method(router.MethodGet),
 					router.Path("/routes"),
@@ -68,7 +68,7 @@ func main() {
 		logger.Fatal(err)
 	}
 
-	if config.GetServerConfig().Env == config.EnvProd {
+	if config.GetRouterConfig().Env == config.EnvProd {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -76,7 +76,7 @@ func main() {
 	opts := []micro.Option{
 		micro.Name(config.Name),
 		micro.Version(config.Version),
-		micro.Address(config.GetServerConfig().Address),
+		micro.Address(config.GetRouterConfig().Address),
 		micro.Action(func(c *cli.Context) error {
 			r.Use(gin.Logger(), gin.Recovery())
 

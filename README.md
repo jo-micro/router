@@ -19,7 +19,7 @@ It looks for services that host "proto/routerclientpb/routerclientpb.RouterClien
 
 Have a look at [internalService](https://github.com/go-micro/router/blob/master/cmd/microrouterd/main.go#L35) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
 
-Here some code from the microlobby project
+Here's some code from the microlobby project
 ```go
 import (
 	"github.com/go-micro/router"
@@ -82,20 +82,22 @@ func main() {
 }
 ```
 
-## Build podman/docker image
+## Developers corner
 
-### Prerequesits
+### Build podman/docker image
+
+#### Prerequesits
 
 - podman
 - [Task](https://taskfile.dev/#/installation)
 
-### Build
+#### Build
 
 ```bash
 task
 ```
 
-### Remove everything except the resulting podman images created by task
+#### Remove everything except the resulting podman images created by task
 
 ```bash
 task rm

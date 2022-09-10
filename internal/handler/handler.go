@@ -86,7 +86,7 @@ func (h *Handler) Start() error {
 				}
 			}
 
-			time.Sleep(time.Duration(config.GetServerConfig().RefreshSeconds) * time.Second)
+			time.Sleep(time.Duration(config.GetRouterConfig().RefreshSeconds) * time.Second)
 		}
 	}()
 

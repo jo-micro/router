@@ -15,10 +15,10 @@ const (
 )
 
 type Config struct {
-	Server ServerConfig
+	Router RouterConfig
 }
 
-type ServerConfig struct {
+type RouterConfig struct {
 	Env            string
 	Address        string
 	RouterURI      string
@@ -29,6 +29,6 @@ func GetConfig() Config {
 	return *_cfg
 }
 
-func GetServerConfig() ServerConfig {
-	return _cfg.Server
+func GetRouterConfig() RouterConfig {
+	return _cfg.Router
 }

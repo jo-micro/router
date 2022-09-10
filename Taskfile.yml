@@ -29,9 +29,9 @@ tasks:
     deps: 
       - volume
     cmds: 
-      - podman build -v "{{.VOLUME_PATH}}:/go:rw" -t docker.io/pcdummy/go-micro-router-builder:latest -f ./docker/builder/Dockerfile .
+      - podman build -v "{{.VOLUME_PATH}}:/go:rw" -t docker.io/pcdummy/go-micro-router-builder:latest -f ./docker/builder/Dockerfile ./docker/builder/
     sources:
-      - ./docker/builder/Dockerfile
+      - ./docker/builder/**/*
     vars:
       VOLUME_PATH:
         sh: podman volume inspect micro_router_go  --format "{{"{{"}}.Mountpoint{{"}}"}}"
@@ -53,16 +53,13 @@ tasks:
     cmds:
       - task: builder
         vars:
-          CLI_ARGS: /bin/sh -c 'cd ./internal/proto/routerclientpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerclientpb.proto'
-      - task: builder
-        vars:
-          CLI_ARGS: /bin/sh -c 'cd ./internal/proto/routerserverpb; protoc --proto_path=/go/bin:. --micro_out=paths=source_relative:. --go_out=paths=source_relative:. routerserverpb.proto'
+          CLI_ARGS: /scripts/protoc_gen.sh
 
   build:podman:
     deps:
       - protoc
     cmds:
-      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg VERSION={{.VERSION}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/go-micro-router/Dockerfile .
+      - podman build -v "$PWD:/code:rw" -v "{{.VOLUME_PATH}}:/go:rw" --build-arg CACHEBUST={{.DATE}} --build-arg VERSION={{.VERSION}} -t docker.io/pcdummy/go-micro-router:latest -f ./docker/router/Dockerfile .
     vars:
       DATE:
         sh: date +%s
@@ -103,7 +100,7 @@ tasks:
     cmds:
       - task: builder
         vars:
-          CLI_ARGS: go get -u ./...
+          CLI_ARGS: /scripts/upgrade_deps.sh
 
   rm:
     desc: Remove all persistent data
