@@ -13,9 +13,9 @@ import (
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
-	"go-micro.dev/v4/logger"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
+	iLogger "jochum.dev/jo-micro/router/internal/logger"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 	"jochum.dev/jo-micro/router/internal/util"
@@ -51,16 +51,16 @@ func (h *Handler) Start() error {
 		for {
 			services, err := util.FindByEndpoint(h.service, "RouterClientService.Routes")
 			if err != nil {
-				logger.Error(err)
+				iLogger.WithCaller().Error(err)
 				continue
 			}
 
 			for _, s := range services {
-				logger.Debug("Found service ", s.Name)
+				iLogger.WithCaller().Debug("Found service ", s.Name)
 				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
 				resp, err := client.Routes(ctx, &emptypb.Empty{})
 				if err != nil {
-					logger.Error(err)
+					iLogger.WithCaller().Error(err)
 					// failure in getting routes, silently ignore
 					continue
 				}
@@ -68,7 +68,7 @@ func (h *Handler) Start() error {
 				serviceGroup := globalGroup.Group(fmt.Sprintf("/%s", resp.GetRouterURI()))
 
 				for _, route := range resp.Routes {
-					logger.Debug("Found endpoint ", route.Endpoint)
+					iLogger.WithCaller().Debug("Found endpoint ", route.Endpoint)
 					var g *gin.RouterGroup = nil
 
 					if route.IsGlobal {
@@ -173,7 +173,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		var response json.RawMessage
 		err := h.service.Client().Call(ctx, req, &response)
 		if err != nil {
-			logger.Error(err)
+			iLogger.WithCaller().Error(err)
 
 			pErr := errors.FromError(err)
 			code := int(http.StatusInternalServerError)
