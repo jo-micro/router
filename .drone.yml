@@ -22,7 +22,6 @@ steps:
     password: 
       from_secret: registry.fk.jochum.dev-robot
     dockerfile: ./docker/router/Dockerfile
-    context: ./docker/router/
     repo: registry.fk.jochum.dev/jo-micro/router
     build_args:
     - VERSION=${DRONE_TAG:1}

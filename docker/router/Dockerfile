@@ -6,13 +6,13 @@ RUN useradd appuser
 
 VOLUME [ "/go" ]
 
-WORKDIR /code
-
 # RUN go mod download
 ENV GOPATH="/go"
 
 ARG VERSION
 COPY . /code/
+
+WORKDIR /code
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -installsuffix cgo -ldflags="-w -s -X 'jochum.dev/jo-micro/router/internal/config.Version=$VERSION'" -o /usr/local/bin/microrouterd jochum.dev/jo-micro/router/cmd/microrouterd
 
 # STEP 2 build a small image
