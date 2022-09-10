@@ -4,7 +4,6 @@ import (
 	"os"
 	"strings"
 
-	"git.jochum.dev/jo-micro/router/internal/util"
 	"github.com/go-micro/plugins/v4/config/encoder/toml"
 	"github.com/go-micro/plugins/v4/config/encoder/yaml"
 	"github.com/pkg/errors"
@@ -14,6 +13,7 @@ import (
 	"go-micro.dev/v4/config/source/env"
 	"go-micro.dev/v4/config/source/file"
 	"go-micro.dev/v4/logger"
+	"jochum.dev/jo-micro/router/internal/util"
 )
 
 // internal instance of Config

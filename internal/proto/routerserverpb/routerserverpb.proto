@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package routerserverpb;
 
-option go_package = "git.jochum.dev/jo-micro/router/proto/routerserverpb;routerserverpb";
+option go_package = "jochum.dev/jo-micro/router/proto/routerserverpb;routerserverpb";
 
 import "google/protobuf/empty.proto";
 

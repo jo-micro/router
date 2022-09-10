@@ -9,16 +9,16 @@ import (
 	"net/http"
 	"time"
 
-	"git.jochum.dev/jo-micro/router/internal/config"
-	"git.jochum.dev/jo-micro/router/internal/proto/routerclientpb"
-	"git.jochum.dev/jo-micro/router/internal/proto/routerserverpb"
-	"git.jochum.dev/jo-micro/router/internal/util"
 	"github.com/gin-gonic/gin"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
 	"go-micro.dev/v4/logger"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"jochum.dev/jo-micro/router/internal/config"
+	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
+	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
+	"jochum.dev/jo-micro/router/internal/util"
 )
 
 type JSONRoute struct {

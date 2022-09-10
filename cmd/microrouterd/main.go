@@ -5,13 +5,13 @@ import (
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
 
-	"git.jochum.dev/jo-micro/router"
 	"github.com/gin-gonic/gin"
 	httpServer "github.com/go-micro/plugins/v4/server/http"
+	"jochum.dev/jo-micro/router"
 
-	"git.jochum.dev/jo-micro/router/internal/config"
-	"git.jochum.dev/jo-micro/router/internal/handler"
-	"git.jochum.dev/jo-micro/router/internal/proto/routerserverpb"
+	"jochum.dev/jo-micro/router/internal/config"
+	"jochum.dev/jo-micro/router/internal/handler"
+	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 )
 
 func internalService(engine *gin.Engine) {
