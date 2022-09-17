@@ -33,7 +33,7 @@ services:
       - nats
 ```
 
-See `cmd/microrouterd/plugins.go` for a list of availabel transports, registries and brokers.
+See [cmd/microrouterd/plugins.go](src/branch/master/cmd/microrouterd/plugins.go) for a list of availabel transports, registries and brokers.
 
 ## Todo
 
