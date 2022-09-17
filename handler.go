@@ -16,9 +16,14 @@ type Handler struct {
 }
 
 // NewHandler returns a new dynrouterpb Handler
-func NewHandler(routerURI string, routes ...Route) *Handler {
+func NewHandler(routerURI string, routes ...*Route) *Handler {
 	pbRoutes := []*routerclientpb.RoutesReply_Route{}
 	for _, r := range routes {
+		// NewRoute returns nil if no Endpoint has been specified, ignore these here
+		if r == nil {
+			continue
+		}
+
 		pbRoutes = append(pbRoutes, &routerclientpb.RoutesReply_Route{
 			IsGlobal: r.IsGlobal,
 			Method:   r.Method,

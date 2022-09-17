@@ -36,6 +36,8 @@ tasks:
     vars:
       VOLUME_PATH:
         sh: podman volume inspect jo_micro-router_go --format "{{"{{"}}.Mountpoint{{"}}"}}"
+    preconditions:
+      - test -n "{{.CLI_ARGS}}"
 
   protoc:
     run: "once"

@@ -1,6 +1,8 @@
 package router
 
-import "net/http"
+import (
+	"log"
+)
 
 type Route struct {
 	// isGlobal=True == no prefix route
@@ -13,17 +15,22 @@ type Route struct {
 
 type Option func(*Route)
 
-func NewRoute(endpoint interface{}, opts ...Option) Route {
-	route := Route{
+func NewRoute(opts ...Option) *Route {
+	route := &Route{
 		IsGlobal: false,
-		Method:   http.MethodGet,
+		Method:   MethodGet,
 		Path:     "/",
-		Endpoint: endpoint,
+		Endpoint: nil,
 		Params:   []string{},
 	}
 
 	for _, o := range opts {
-		o(&route)
+		o(route)
+	}
+
+	if route.Endpoint == nil {
+		log.Println("router.Endpoint() is a required argument")
+		return nil
 	}
 
 	return route

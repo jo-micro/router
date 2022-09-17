@@ -30,6 +30,14 @@ func Intialized() bool {
 	return initialized
 }
 
+// caller returns string presentation of log caller which is formatted as
+// `/path/to/file.go:line_number`. e.g. `/internal/app/api.go:25`
+func caller() func(*runtime.Frame) (function string, file string) {
+	return func(f *runtime.Frame) (function string, file string) {
+		return "", fmt.Sprintf("%s:%d", f.File, f.Line)
+	}
+}
+
 func Start(cli *cli.Context) error {
 	if initialized {
 		return nil
@@ -43,6 +51,15 @@ func Start(cli *cli.Context) error {
 	myLogger = logrus.New()
 	myLogger.Out = os.Stdout
 	myLogger.Level = lvl
+
+	myLogger.SetReportCaller(true)
+
+	myLogger.SetFormatter(&logrus.JSONFormatter{
+		CallerPrettyfier: caller(),
+		FieldMap: logrus.FieldMap{
+			logrus.FieldKeyFile: "caller",
+		},
+	})
 
 	microLogger.DefaultLogger = microLogrus.NewLogger(microLogrus.WithLogger(myLogger))
 
@@ -59,14 +76,4 @@ func Stop() error {
 
 func Logrus() *logrus.Logger {
 	return myLogger
-}
-
-func WithCaller() *logrus.Entry {
-	e := logrus.NewEntry(myLogger)
-	_, file, no, ok := runtime.Caller(1)
-	if ok {
-		e.WithField("caller", fmt.Sprintf("%s:%d", file, no))
-	}
-
-	return e
 }

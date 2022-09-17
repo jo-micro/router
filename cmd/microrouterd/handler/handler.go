@@ -30,14 +30,14 @@ type JSONRoute struct {
 type Handler struct {
 	service micro.Service
 	engine  *gin.Engine
-	routes  map[string]bool
+	routes  map[string]*routerclientpb.RoutesReply_Route
 }
 
 func NewHandler(service micro.Service, engine *gin.Engine) (*Handler, error) {
 	return &Handler{
 		service: service,
 		engine:  engine,
-		routes:  make(map[string]bool),
+		routes:  make(map[string]*routerclientpb.RoutesReply_Route),
 	}, nil
 }
 
@@ -51,16 +51,16 @@ func (h *Handler) Start() error {
 		for {
 			services, err := util.FindByEndpoint(h.service, "RouterClientService.Routes")
 			if err != nil {
-				iLogger.WithCaller().Error(err)
+				iLogger.Logrus().Error(err)
 				continue
 			}
 
 			for _, s := range services {
-				iLogger.WithCaller().Debug("Found service ", s.Name)
+				iLogger.Logrus().WithField("service", s.Name).Tracef("Found service")
 				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
 				resp, err := client.Routes(ctx, &emptypb.Empty{})
 				if err != nil {
-					iLogger.WithCaller().Error(err)
+					iLogger.Logrus().Error(err)
 					// failure in getting routes, silently ignore
 					continue
 				}
@@ -68,7 +68,6 @@ func (h *Handler) Start() error {
 				serviceGroup := globalGroup.Group(fmt.Sprintf("/%s", resp.GetRouterURI()))
 
 				for _, route := range resp.Routes {
-					iLogger.WithCaller().Debug("Found endpoint ", route.Endpoint)
 					var g *gin.RouterGroup = nil
 
 					if route.IsGlobal {
@@ -77,11 +76,20 @@ func (h *Handler) Start() error {
 						g = serviceGroup
 					}
 
-					// Calculate the path of the route and register it if it's not registered yet
-					path := fmt.Sprintf("%s: %s/%s", route.Method, g.BasePath(), route.Path)
-					if _, ok := h.routes[path]; !ok {
+					// Calculate the pathMethod of the route and register it if it's not registered yet
+					pathMethod := fmt.Sprintf("%s:%s%s", route.GetMethod(), g.BasePath(), route.GetPath())
+					path := fmt.Sprintf("%s%s", g.BasePath(), route.GetPath())
+					if _, ok := h.routes[pathMethod]; !ok {
+						iLogger.Logrus().
+							WithField("service", s.Name).
+							WithField("endpoint", route.GetEndpoint()).
+							WithField("method", route.GetMethod()).
+							WithField("path", path).
+							Debugf("Found route")
+
 						g.Handle(route.GetMethod(), route.GetPath(), h.proxy(s.Name, route))
-						h.routes[path] = true
+						h.routes[pathMethod] = route
+						h.routes[pathMethod].Path = path
 					}
 				}
 			}
@@ -173,7 +181,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		var response json.RawMessage
 		err := h.service.Client().Call(ctx, req, &response)
 		if err != nil {
-			iLogger.WithCaller().Error(err)
+			iLogger.Logrus().Error(err)
 
 			pErr := errors.FromError(err)
 			code := int(http.StatusInternalServerError)
@@ -192,9 +200,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 }
 
 func (h *Handler) Routes(ctx context.Context, in *emptypb.Empty, out *routerserverpb.RoutesReply) error {
-	ginRoutes := h.engine.Routes()
-
-	for _, route := range ginRoutes {
+	for _, route := range h.routes {
 		out.Routes = append(out.Routes, &routerserverpb.RoutesReply_Route{
 			Method: route.Method,
 			Path:   route.Path,

@@ -30,7 +30,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/toorop/gin-logrus v0.0.0-20210225092905-2c785434f26f
-	github.com/urfave/cli/v2 v2.15.0
+	github.com/urfave/cli/v2 v2.16.0
 	go-micro.dev/v4 v4.8.1
 	google.golang.org/protobuf v1.28.1
 )

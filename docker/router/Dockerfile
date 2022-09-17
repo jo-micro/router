@@ -1,3 +1,5 @@
+ARG DOCKER_IO=docker.io
+
 # STEP 1 build executable binary
 FROM registry.fk.jochum.dev/jo-micro/builder:latest AS builder
 
@@ -11,7 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -installsuffix cgo -ldflags="
 
 # STEP 2 build a small image
 # start from busybox
-FROM busybox
+FROM ${DOCKER_IO}/library/busybox:latest
 
 LABEL maintainer="René Jochum <rene@jochum.dev>"
 
