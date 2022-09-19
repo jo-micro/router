@@ -180,7 +180,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 
 		// Auth
 		ctx, err := h.routerAuth.ForwardContext(c.Request, c)
-		if err != nil || authRequired {
+		if err != nil && authRequired {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"status":  http.StatusUnauthorized,
 				"message": err,
