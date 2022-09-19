@@ -18,6 +18,7 @@ message RoutesReply {
         string path = 3;
         string endpoint = 4;
         repeated string params = 5;
+        bool authRequired = 6;
     }
 
     string routerURI = 1;

@@ -43,7 +43,7 @@ tasks:
     run: "once"
     desc: Generate protobruf go files
     sources:
-      - ./proto/**/*.proto
+      - ./internal/proto/**/*.proto
     cmds:
       - task: builder
         vars:

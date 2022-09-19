@@ -14,6 +14,7 @@ import (
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"jochum.dev/jo-micro/auth"
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
 	iLogger "jochum.dev/jo-micro/router/internal/logger"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
@@ -28,20 +29,22 @@ type JSONRoute struct {
 
 // Handler is the handler for the proxy
 type Handler struct {
-	service micro.Service
-	engine  *gin.Engine
-	routes  map[string]*routerclientpb.RoutesReply_Route
+	service    micro.Service
+	engine     *gin.Engine
+	routerAuth auth.RouterPlugin
+	routes     map[string]*routerclientpb.RoutesReply_Route
 }
 
-func NewHandler(service micro.Service, engine *gin.Engine) (*Handler, error) {
+func NewHandler() (*Handler, error) {
 	return &Handler{
-		service: service,
-		engine:  engine,
-		routes:  make(map[string]*routerclientpb.RoutesReply_Route),
+		routes: make(map[string]*routerclientpb.RoutesReply_Route),
 	}, nil
 }
 
-func (h *Handler) Start() error {
+func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth.RouterPlugin) error {
+	h.service = service
+	h.engine = engine
+	h.routerAuth = routerAuth
 	globalGroup := h.engine.Group("")
 
 	// Refresh routes for the proxy every 10 seconds
@@ -87,7 +90,7 @@ func (h *Handler) Start() error {
 							WithField("path", path).
 							Debugf("Found route")
 
-						g.Handle(route.GetMethod(), route.GetPath(), h.proxy(s.Name, route))
+						g.Handle(route.GetMethod(), route.GetPath(), h.proxy(s.Name, route, route.AuthRequired))
 						h.routes[pathMethod] = route
 						h.routes[pathMethod].Path = path
 					}
@@ -105,7 +108,7 @@ func (h *Handler) Stop() error {
 	return nil
 }
 
-func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Route) func(*gin.Context) {
+func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Route, authRequired bool) func(*gin.Context) {
 	return func(c *gin.Context) {
 		// Map query/path params
 		params := make(map[string]string)
@@ -175,11 +178,19 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 
 		req := h.service.Client().NewRequest(serviceName, route.GetEndpoint(), request, client.WithContentType("application/json"))
 
-		ctx := util.CtxFromRequest(c, c.Request)
+		// Auth
+		ctx, err := h.routerAuth.ForwardContext(c.Request, c)
+		if err != nil || authRequired {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"status":  http.StatusUnauthorized,
+				"message": err,
+			})
+			return
+		}
 
 		// remote call
 		var response json.RawMessage
-		err := h.service.Client().Call(ctx, req, &response)
+		err = h.service.Client().Call(ctx, req, &response)
 		if err != nil {
 			iLogger.Logrus().Error(err)
 

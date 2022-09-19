@@ -3,3 +3,6 @@
 .task/
 
 !.gitkeep
+
+go.work
+go.work.sum

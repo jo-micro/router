@@ -6,22 +6,24 @@ import (
 
 type Route struct {
 	// isGlobal=True == no prefix route
-	IsGlobal bool
-	Method   string
-	Path     string
-	Endpoint interface{}
-	Params   []string
+	IsGlobal     bool
+	Method       string
+	Path         string
+	Endpoint     interface{}
+	Params       []string
+	AuthRequired bool
 }
 
 type Option func(*Route)
 
 func NewRoute(opts ...Option) *Route {
 	route := &Route{
-		IsGlobal: false,
-		Method:   MethodGet,
-		Path:     "/",
-		Endpoint: nil,
-		Params:   []string{},
+		IsGlobal:     false,
+		Method:       MethodGet,
+		Path:         "/",
+		Endpoint:     nil,
+		Params:       []string{},
+		AuthRequired: false,
 	}
 
 	for _, o := range opts {
@@ -63,5 +65,11 @@ func Endpoint(n interface{}) Option {
 func Params(n ...string) Option {
 	return func(o *Route) {
 		o.Params = n
+	}
+}
+
+func AuthRequired() Option {
+	return func(o *Route) {
+		o.AuthRequired = true
 	}
 }

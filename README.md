@@ -1,4 +1,4 @@
-[![Build Status](https://drone.fk.jochum.dev/api/badges/jo-micro/router/status.svg)](https://drone.fk.jochum.dev/jo-micro/router)
+[![Build Status](https://drone.fk.jochum.dev/api/badges/jo-micro/router/status.svg)](https://drone.fk.jochum.dev/jo-micro/router) [![Go Reference](https://pkg.go.dev/badge/jochum.dev/jo-micro/router.svg)](https://pkg.go.dev/jochum.dev/jo-micro/router)
 
 # router
 
@@ -69,6 +69,7 @@ func main() {
                     router.Path("/"),
                     router.Endpoint(authservicepb.AuthV1Service.UserList),
                     router.Params("limit", "offset"),
+                    router.AuthRequired(),
                 ),
                 router.NewRoute(
                     router.Method(router.MethodPost),
@@ -90,18 +91,21 @@ func main() {
                     router.Path("/:userId"),
                     router.Endpoint(authservicepb.AuthV1Service.UserDelete),
                     router.Params("userId"),
+                    router.AuthRequired(),
                 ),
                 router.NewRoute(
                     router.Method(router.MethodGet),
                     router.Path("/:userId"),
                     router.Endpoint(authservicepb.AuthV1Service.UserDetail),
                     router.Params("userId"),
+                    router.AuthRequired(),
                 ),
                 router.NewRoute(
                     router.Method(router.MethodPut),
                     router.Path("/:userId/roles"),
                     router.Endpoint(authservicepb.AuthV1Service.UserUpdateRoles),
                     router.Params("userId"),
+                    router.AuthRequired(),
                 ),
             )
             r.RegisterWithServer(s)
