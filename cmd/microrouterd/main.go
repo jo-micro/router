@@ -49,11 +49,11 @@ func internalService(routerHandler *handler.Handler) {
 
 	// Run server
 	if err := srv.Run(); err != nil {
-		logger.Fatal(err)
+		iLogger.Logrus().Fatal(err)
 	}
 
 	if err := routerHandler.Stop(); err != nil {
-		logger.Fatal(err)
+		iLogger.Logrus().Fatal(err)
 	}
 }
 
@@ -96,13 +96,12 @@ func main() {
 
 			// Initialize the Auth Plugin over RouterAuthRegistry
 			if err := authReg.Init(c, srv); err != nil {
-				logger.Fatal(err)
-				return err
+				iLogger.Logrus().Fatal(err)
 			}
 
 			// Initalize the Handler
 			if err := routerHandler.Init(srv, r, authReg.MustPlugin()); err != nil {
-				logger.Fatal(err)
+				iLogger.Logrus().Fatal(err)
 			}
 
 			// Add middlewares to gin
@@ -110,7 +109,7 @@ func main() {
 
 			// Register gin with micro
 			if err := micro.RegisterHandler(srv.Server(), r); err != nil {
-				logger.Fatal(err)
+				iLogger.Logrus().Fatal(err)
 			}
 
 			return nil
@@ -122,16 +121,16 @@ func main() {
 
 	// Run server
 	if err := srv.Run(); err != nil {
-		logger.Fatal(err)
+		iLogger.Logrus().Fatal(err)
 	}
 
 	// Stop the plugin in RouterAuthRegistry
 	if err := authReg.Stop(); err != nil {
-		logger.Fatal(err)
+		iLogger.Logrus().Fatal(err)
 	}
 
 	// Stop the logger
 	if err := iLogger.Stop(); err != nil {
-		logger.Fatal(err)
+		iLogger.Logrus().Fatal(err)
 	}
 }
