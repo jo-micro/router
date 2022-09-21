@@ -22,7 +22,7 @@ docker-compose:
 services:
   router:
     restart: unless-stopped
-    image: docker.io/jomicro/router:0.2.3
+    image: docker.io/jomicro/router:0.3.0
     environment:
       - MICRO_TRANSPORT=grpc
       - MICRO_REGISTRY=nats
