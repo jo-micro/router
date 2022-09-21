@@ -14,7 +14,7 @@ import (
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"jochum.dev/jo-micro/auth"
+	"jochum.dev/jo-micro/auth2"
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
 	iLogger "jochum.dev/jo-micro/router/internal/logger"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"

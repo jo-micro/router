@@ -12,7 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	httpServer "github.com/go-micro/plugins/v4/server/http"
-	"jochum.dev/jo-micro/auth"
+	"jochum.dev/jo-micro/auth2"
 	"jochum.dev/jo-micro/router"
 
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
@@ -100,7 +100,7 @@ func main() {
 			}
 
 			// Initalize the Handler
-			if err := routerHandler.Init(srv, r, authReg.MustPlugin()); err != nil {
+			if err := routerHandler.Init(srv, r, authReg.Plugin()); err != nil {
 				iLogger.Logrus().Fatal(err)
 			}
 
