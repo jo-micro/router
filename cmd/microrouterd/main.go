@@ -1,5 +1,3 @@
-// -lang=go1.19
-
 package main
 
 import (
@@ -17,22 +15,32 @@ import (
 
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
 	"jochum.dev/jo-micro/router/cmd/microrouterd/handler"
-	iConfig "jochum.dev/jo-micro/router/internal/config"
 	iLogger "jochum.dev/jo-micro/router/internal/logger"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
+	"jochum.dev/jo-micro/router/internal/util"
 )
 
 func internalService(routerHandler *handler.Handler) {
 	srv := micro.NewService()
 
+	flags := []cli.Flag{
+		&cli.StringFlag{
+			Name:    "router_basepath",
+			Usage:   "Router basepath",
+			EnvVars: []string{"MICRO_ROUTER_BASEPATH"},
+			Value:   "router",
+		},
+	}
+
 	opts := []micro.Option{
 		micro.Name(config.Name + "-internal"),
 		micro.Version(config.Version),
+		micro.Flags(flags...),
 		micro.Action(func(c *cli.Context) error {
 			routerserverpb.RegisterRouterServerServiceHandler(srv.Server(), routerHandler)
 
 			r := router.NewHandler(
-				config.GetRouterConfig().RouterURI,
+				c.String("router_basepath"),
 				router.NewRoute(
 					router.Method(router.MethodGet),
 					router.Path("/routes"),
@@ -62,30 +70,47 @@ func main() {
 		micro.Server(httpServer.NewServer()),
 	)
 
-	if err := iConfig.Load(config.GetConfig()); err != nil {
-		logger.Fatal(err)
-	}
+	authReg := auth2.RouterAuthRegistry()
 
-	if config.GetRouterConfig().Env == config.EnvProd {
-		gin.SetMode(gin.ReleaseMode)
+	flags := []cli.Flag{
+		// General
+		&cli.BoolFlag{
+			Name:    "router_debugmode",
+			Usage:   "Run gin in debugmode?",
+			EnvVars: []string{"MICRO_ROUTER_DEBUGMODE"},
+			Value:   false,
+		},
+		&cli.StringFlag{
+			Name:    "router_basepath",
+			Usage:   "Router basepath",
+			EnvVars: []string{"MICRO_ROUTER_BASEPATH"},
+			Value:   "router",
+		},
+		&cli.IntFlag{
+			Name:    "router_refresh",
+			Usage:   "Router refresh routes every x seconds",
+			EnvVars: []string{"MICRO_ROUTER_REFRESH"},
+			Value:   10,
+		},
+		&cli.StringFlag{
+			Name:    "router_listen",
+			Usage:   "Router listen on",
+			EnvVars: []string{"MICRO_ROUTER_LISTEN"},
+			Value:   ":8080",
+		},
 	}
+	flags = append(flags, iLogger.Flags()...)
+	flags = append(flags, authReg.Flags()...)
 
-	r := gin.New()
 	routerHandler, err := handler.NewHandler()
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	authReg := auth.RouterAuthRegistry()
-
-	flags := []cli.Flag{}
-	flags = append(flags, iLogger.Flags()...)
-	flags = append(flags, authReg.Flags()...)
-
 	opts := []micro.Option{
 		micro.Name(config.Name),
 		micro.Version(config.Version),
-		micro.Address(config.GetRouterConfig().Address),
+		micro.Address(util.GetEnvDefault("MICRO_ROUTER_LISTEN", ":8080")),
 		micro.Flags(flags...),
 		micro.Action(func(c *cli.Context) error {
 			// Start the logger
@@ -99,8 +124,16 @@ func main() {
 				iLogger.Logrus().Fatal(err)
 			}
 
+			// Initialize GIN
+			if c.Bool("router_debugmode") {
+				gin.SetMode(gin.DebugMode)
+			} else {
+				gin.SetMode(gin.ReleaseMode)
+			}
+			r := gin.New()
+
 			// Initalize the Handler
-			if err := routerHandler.Init(srv, r, authReg.Plugin()); err != nil {
+			if err := routerHandler.Init(srv, r, authReg.Plugin(), c.Int("router_refresh")); err != nil {
 				iLogger.Logrus().Fatal(err)
 			}
 

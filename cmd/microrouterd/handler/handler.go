@@ -14,8 +14,7 @@ import (
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"jochum.dev/jo-micro/auth2"
-	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
+	auth "jochum.dev/jo-micro/auth2"
 	iLogger "jochum.dev/jo-micro/router/internal/logger"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
@@ -41,7 +40,7 @@ func NewHandler() (*Handler, error) {
 	}, nil
 }
 
-func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth.RouterPlugin) error {
+func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth.RouterPlugin, refreshSeconds int) error {
 	h.service = service
 	h.engine = engine
 	h.routerAuth = routerAuth
@@ -97,7 +96,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 				}
 			}
 
-			time.Sleep(time.Duration(config.GetRouterConfig().RefreshSeconds) * time.Second)
+			time.Sleep(time.Duration(refreshSeconds) * time.Second)
 		}
 	}()
 
