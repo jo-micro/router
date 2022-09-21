@@ -15,7 +15,7 @@ import (
 
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
 	"jochum.dev/jo-micro/router/cmd/microrouterd/handler"
-	iLogger "jochum.dev/jo-micro/router/internal/logger"
+	"jochum.dev/jo-micro/router/internal/ilogger"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 	"jochum.dev/jo-micro/router/internal/util"
 )
@@ -28,7 +28,7 @@ func internalService(routerHandler *handler.Handler) {
 		micro.Version(config.Version),
 		micro.Action(func(c *cli.Context) error {
 			if err := auth2.ClientAuthRegistry().Init(c, srv); err != nil {
-				iLogger.Logrus().Fatal(err)
+				ilogger.Logrus().Fatal(err)
 			}
 
 			routerserverpb.RegisterRouterServerServiceHandler(srv.Server(), routerHandler)
@@ -51,17 +51,17 @@ func internalService(routerHandler *handler.Handler) {
 
 	// Run server
 	if err := srv.Run(); err != nil {
-		iLogger.Logrus().Fatal(err)
+		ilogger.Logrus().Fatal(err)
 	}
 
 	// Stop the handler
 	if err := routerHandler.Stop(); err != nil {
-		iLogger.Logrus().Fatal(err)
+		ilogger.Logrus().Fatal(err)
 	}
 
 	// Stop the client/service auth plugin
 	if err := auth2.ClientAuthRegistry().Stop(); err != nil {
-		iLogger.Logrus().Fatal(err)
+		ilogger.Logrus().Fatal(err)
 	}
 }
 
@@ -72,7 +72,7 @@ func main() {
 
 	routerAuthReg := auth2.RouterAuthRegistry()
 
-	flags := iLogger.AppendFlags(routerAuthReg.AppendFlags(auth2.ClientAuthRegistry().AppendFlags([]cli.Flag{
+	flags := ilogger.AppendFlags(routerAuthReg.AppendFlags(auth2.ClientAuthRegistry().AppendFlags([]cli.Flag{
 		// General
 		&cli.BoolFlag{
 			Name:    "router_debugmode",
@@ -112,14 +112,14 @@ func main() {
 		micro.Flags(flags...),
 		micro.Action(func(c *cli.Context) error {
 			// Start the logger
-			if err := iLogger.Start(c); err != nil {
+			if err := ilogger.Start(c); err != nil {
 				log.Fatal(err)
 				return err
 			}
 
 			// Initialize the Auth Plugin over RouterAuthRegistry
 			if err := routerAuthReg.Init(c, srv); err != nil {
-				iLogger.Logrus().Fatal(err)
+				ilogger.Logrus().Fatal(err)
 			}
 
 			// Initialize GIN
@@ -132,15 +132,15 @@ func main() {
 
 			// Initalize the Handler
 			if err := routerHandler.Init(srv, r, routerAuthReg.Plugin(), c.Int("router_refresh")); err != nil {
-				iLogger.Logrus().Fatal(err)
+				ilogger.Logrus().Fatal(err)
 			}
 
 			// Add middlewares to gin
-			r.Use(ginlogrus.Logger(iLogger.Logrus()), gin.Recovery())
+			r.Use(ginlogrus.Logger(ilogger.Logrus()), gin.Recovery())
 
 			// Register gin with micro
 			if err := micro.RegisterHandler(srv.Server(), r); err != nil {
-				iLogger.Logrus().Fatal(err)
+				ilogger.Logrus().Fatal(err)
 			}
 
 			return nil
@@ -152,16 +152,16 @@ func main() {
 
 	// Run server
 	if err := srv.Run(); err != nil {
-		iLogger.Logrus().Fatal(err)
+		ilogger.Logrus().Fatal(err)
 	}
 
 	// Stop the plugin in RouterAuthRegistry
 	if err := routerAuthReg.Stop(); err != nil {
-		iLogger.Logrus().Fatal(err)
+		ilogger.Logrus().Fatal(err)
 	}
 
 	// Stop the logger
-	if err := iLogger.Stop(); err != nil {
-		iLogger.Logrus().Fatal(err)
+	if err := ilogger.Stop(); err != nil {
+		ilogger.Logrus().Fatal(err)
 	}
 }

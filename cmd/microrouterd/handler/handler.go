@@ -16,7 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"jochum.dev/jo-micro/auth2"
 	auth "jochum.dev/jo-micro/auth2"
-	iLogger "jochum.dev/jo-micro/router/internal/logger"
+	"jochum.dev/jo-micro/router/internal/ilogger"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 	"jochum.dev/jo-micro/router/internal/util"
@@ -54,21 +54,21 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 		for {
 			services, err := util.FindByEndpoint(h.service, "RouterClientService.Routes")
 			if err != nil {
-				iLogger.Logrus().Error(err)
+				ilogger.Logrus().Error(err)
 				continue
 			}
 
 			for _, s := range services {
-				iLogger.Logrus().WithField("service", s.Name).Tracef("Found service")
+				ilogger.Logrus().WithField("service", s.Name).Tracef("Found service")
 				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
 				sCtx, err := auth2.ClientAuthRegistry().Plugin().ServiceContext(ctx)
 				if err != nil {
-					iLogger.Logrus().Error(err)
+					ilogger.Logrus().Error(err)
 					continue
 				}
 				resp, err := client.Routes(sCtx, &emptypb.Empty{})
 				if err != nil {
-					iLogger.Logrus().Error(err)
+					ilogger.Logrus().Error(err)
 					// failure in getting routes, silently ignore
 					continue
 				}
@@ -88,7 +88,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 					pathMethod := fmt.Sprintf("%s:%s%s", route.GetMethod(), g.BasePath(), route.GetPath())
 					path := fmt.Sprintf("%s%s", g.BasePath(), route.GetPath())
 					if _, ok := h.routes[pathMethod]; !ok {
-						iLogger.Logrus().
+						ilogger.Logrus().
 							WithField("service", s.Name).
 							WithField("endpoint", route.GetEndpoint()).
 							WithField("method", route.GetMethod()).
@@ -197,7 +197,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		var response json.RawMessage
 		err = h.service.Client().Call(ctx, req, &response)
 		if err != nil {
-			iLogger.Logrus().Error(err)
+			ilogger.Logrus().Error(err)
 
 			pErr := errors.FromError(err)
 			code := int(http.StatusInternalServerError)
