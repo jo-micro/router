@@ -38,8 +38,6 @@ tasks:
           -v "{{.BUILD_MOUNT_FOLDER_INT}}:{{.BUILD_MOUNT_FOLDER_INT}}" 
           -v "{{.PWD}}:/code" 
           -v "{{.VOLUME_PATH}}:/go:rw"
-          --build-arg=DOCKER_IO={{.DOCKER_IO}}
-          --build-arg=DOCKER_ORG_JO_MICRO={{.DOCKER_ORG_JO_MICRO}}
           {{.DOCKER_ORG_JO_MICRO}}/builder:latest {{.CLI_ARGS}}
     vars:
       VOLUME_PATH:
