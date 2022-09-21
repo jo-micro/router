@@ -7,6 +7,7 @@ import (
 
 	microLogrus "github.com/go-micro/plugins/v4/logger/logrus"
 	microLogger "go-micro.dev/v4/logger"
+	"jochum.dev/jo-micro/router/internal/util"
 
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
@@ -15,15 +16,13 @@ import (
 var myLogger *logrus.Logger = nil
 var initialized = false
 
-func Flags() []cli.Flag {
-	return []cli.Flag{
-		&cli.StringFlag{
-			Name:    "loglevel",
-			Value:   "info",
-			Usage:   "Logrus log level default 'info', {panic,fatal,error,warn,info,debug,trace} available",
-			EnvVars: []string{"LOG_LEVEL"},
-		},
-	}
+func AppendFlags(flags []cli.Flag) []cli.Flag {
+	return util.AppendFlag(flags, &cli.StringFlag{
+		Name:    "router_loglevel",
+		Value:   "info",
+		Usage:   "Logrus log level default 'info', {panic,fatal,error,warn,info,debug,trace} available",
+		EnvVars: []string{"MICRO_ROUTER_LOG_LEVEL"},
+	})
 }
 
 func Intialized() bool {
@@ -43,7 +42,7 @@ func Start(cli *cli.Context) error {
 		return nil
 	}
 
-	lvl, err := logrus.ParseLevel(cli.String("loglevel"))
+	lvl, err := logrus.ParseLevel(cli.String("router_loglevel"))
 	if err != nil {
 		return err
 	}

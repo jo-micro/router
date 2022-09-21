@@ -6,5 +6,6 @@ import (
 	_ "github.com/go-micro/plugins/v4/transport/grpc"
 	_ "github.com/go-micro/plugins/v4/transport/nats"
 
+	_ "jochum.dev/jo-micro/auth2/plugins/client/jwt"
 	_ "jochum.dev/jo-micro/auth2/plugins/router/jwt"
 )

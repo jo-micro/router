@@ -23,20 +23,14 @@ import (
 func internalService(routerHandler *handler.Handler) {
 	srv := micro.NewService()
 
-	flags := []cli.Flag{
-		&cli.StringFlag{
-			Name:    "router_basepath",
-			Usage:   "Router basepath",
-			EnvVars: []string{"MICRO_ROUTER_BASEPATH"},
-			Value:   "router",
-		},
-	}
-
 	opts := []micro.Option{
 		micro.Name(config.Name + "-internal"),
 		micro.Version(config.Version),
-		micro.Flags(flags...),
 		micro.Action(func(c *cli.Context) error {
+			if err := auth2.ClientAuthRegistry().Init(c, srv); err != nil {
+				iLogger.Logrus().Fatal(err)
+			}
+
 			routerserverpb.RegisterRouterServerServiceHandler(srv.Server(), routerHandler)
 
 			r := router.NewHandler(
@@ -60,7 +54,13 @@ func internalService(routerHandler *handler.Handler) {
 		iLogger.Logrus().Fatal(err)
 	}
 
+	// Stop the handler
 	if err := routerHandler.Stop(); err != nil {
+		iLogger.Logrus().Fatal(err)
+	}
+
+	// Stop the client/service auth plugin
+	if err := auth2.ClientAuthRegistry().Stop(); err != nil {
 		iLogger.Logrus().Fatal(err)
 	}
 }
@@ -70,9 +70,9 @@ func main() {
 		micro.Server(httpServer.NewServer()),
 	)
 
-	authReg := auth2.RouterAuthRegistry()
+	routerAuthReg := auth2.RouterAuthRegistry()
 
-	flags := []cli.Flag{
+	flags := iLogger.AppendFlags(routerAuthReg.AppendFlags(auth2.ClientAuthRegistry().AppendFlags([]cli.Flag{
 		// General
 		&cli.BoolFlag{
 			Name:    "router_debugmode",
@@ -98,9 +98,7 @@ func main() {
 			EnvVars: []string{"MICRO_ROUTER_LISTEN"},
 			Value:   ":8080",
 		},
-	}
-	flags = append(flags, iLogger.Flags()...)
-	flags = append(flags, authReg.Flags()...)
+	})))
 
 	routerHandler, err := handler.NewHandler()
 	if err != nil {
@@ -120,7 +118,7 @@ func main() {
 			}
 
 			// Initialize the Auth Plugin over RouterAuthRegistry
-			if err := authReg.Init(c, srv); err != nil {
+			if err := routerAuthReg.Init(c, srv); err != nil {
 				iLogger.Logrus().Fatal(err)
 			}
 
@@ -133,7 +131,7 @@ func main() {
 			r := gin.New()
 
 			// Initalize the Handler
-			if err := routerHandler.Init(srv, r, authReg.Plugin(), c.Int("router_refresh")); err != nil {
+			if err := routerHandler.Init(srv, r, routerAuthReg.Plugin(), c.Int("router_refresh")); err != nil {
 				iLogger.Logrus().Fatal(err)
 			}
 
@@ -158,7 +156,7 @@ func main() {
 	}
 
 	// Stop the plugin in RouterAuthRegistry
-	if err := authReg.Stop(); err != nil {
+	if err := routerAuthReg.Stop(); err != nil {
 		iLogger.Logrus().Fatal(err)
 	}
 

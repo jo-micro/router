@@ -14,6 +14,7 @@ import (
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"jochum.dev/jo-micro/auth2"
 	auth "jochum.dev/jo-micro/auth2"
 	iLogger "jochum.dev/jo-micro/router/internal/logger"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
@@ -60,7 +61,12 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 			for _, s := range services {
 				iLogger.Logrus().WithField("service", s.Name).Tracef("Found service")
 				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
-				resp, err := client.Routes(ctx, &emptypb.Empty{})
+				sCtx, err := auth2.ClientAuthRegistry().Plugin().ServiceContext(ctx)
+				if err != nil {
+					iLogger.Logrus().Error(err)
+					continue
+				}
+				resp, err := client.Routes(sCtx, &emptypb.Empty{})
 				if err != nil {
 					iLogger.Logrus().Error(err)
 					// failure in getting routes, silently ignore
