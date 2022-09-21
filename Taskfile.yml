@@ -1,5 +1,7 @@
 version: '3'
 
+dotenv: [".env"]
+
 vars:
   GIT_TAG: 
     sh: git tag --points-at HEAD
@@ -32,10 +34,18 @@ tasks:
   builder:
     desc: Run something in the builder container for example "task builder -- go get -u ./..."
     cmds:
-      - podman run --rm -v "{{.PWD}}:/code" -v "{{.VOLUME_PATH}}:/go:rw" registry.fk.jochum.dev/jo-micro/builder:latest {{.CLI_ARGS}}
+      - podman run --rm 
+          -v "{{.BUILD_MOUNT_FOLDER_INT}}:{{.BUILD_MOUNT_FOLDER_INT}}" 
+          -v "{{.PWD}}:/code" 
+          -v "{{.VOLUME_PATH}}:/go:rw"
+          --build-arg=DOCKER_IO={{.DOCKER_IO}}
+          --build-arg=DOCKER_ORG_JO_MICRO={{.DOCKER_ORG_JO_MICRO}}
+          {{.DOCKER_ORG_JO_MICRO}}/builder:latest {{.CLI_ARGS}}
     vars:
       VOLUME_PATH:
         sh: podman volume inspect jo_micro-router_go --format "{{"{{"}}.Mountpoint{{"}}"}}"
+      BUILD_MOUNT_FOLDER_INT:
+        sh: realpath {{.BUILD_MOUNT_FOLDER}}
     preconditions:
       - test -n "{{.CLI_ARGS}}"
 
@@ -53,13 +63,23 @@ tasks:
     deps:
       - protoc
     cmds:
-      - podman build -v "{{.VOLUME_PATH}}:/go:rw" --build-arg VERSION={{.VERSION}} -t registry.fk.jochum.dev/jo-micro/router:latest -f ./docker/router/Dockerfile .
+      - podman build 
+          -v "{{.BUILD_MOUNT_FOLDER_INT}}:{{.BUILD_MOUNT_FOLDER_INT}}" 
+          -v "{{.VOLUME_PATH}}:/go:rw" 
+          --build-arg VERSION={{.VERSION}}
+          --build-arg=DOCKER_IO={{.DOCKER_IO}}
+          --build-arg=DOCKER_ORG_JO_MICRO={{.DOCKER_ORG_JO_MICRO}}
+          -t {{.DOCKER_ORG_JO_MICRO}}/router:latest
+          -f ./docker/router/Dockerfile
+          .
     vars:
       VOLUME_PATH:
         sh: podman volume inspect jo_micro-router_go --format "{{"{{"}}.Mountpoint{{"}}"}}"
+      BUILD_MOUNT_FOLDER_INT:
+        sh: realpath {{.BUILD_MOUNT_FOLDER}}
 
   podman:
-    desc: Generate docker container for jo-micro/router tagged as registry.fk.jochum.dev/jo-micro/router:latest
+    desc: Generate docker container for jo-micro/router tagged as {{.DOCKER_ORG_JO_MICRO}}/router:latest
     cmds:
       - task: build:podman
 
@@ -80,5 +100,5 @@ tasks:
   rm:
     desc: Remove all persistent data
     cmds:
-      - podman image rm registry.fk.jochum.dev/jo-micro/router:latest || exit 0
+      - podman image rm {{.DOCKER_ORG_JO_MICRO}}/router:latest || exit 0
       - rm -rf $PWD/.task

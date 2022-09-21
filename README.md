@@ -44,7 +44,7 @@ See [cmd/microrouterd/plugins.go](cmd/microrouterd/plugins.go) for a list of ava
 
 ## Integration examples
 
-Have a look at [internalService](https://jochum.dev/jo-micro/router/blob/master/cmd/microrouterd/main.go#L35) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
+Have a look at [internalService](cmd/microrouterd/main.go#L35) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
 
 Here's some code from the microlobby project
 
@@ -126,6 +126,7 @@ func main() {
 #### Build
 
 ```bash
+cp .env.sample .env
 task
 ```
 

@@ -1,7 +1,8 @@
 ARG DOCKER_IO=docker.io
+ARG DOCKER_ORG_JO_MICRO=docker.io/jomicro
 
 # STEP 1 build executable binary
-FROM registry.fk.jochum.dev/jo-micro/builder:latest AS builder
+FROM ${DOCKER_ORG_JO_MICRO}/builder:latest AS builder
 
 # Create appuser (/etc/passwd entry for the runner container)
 RUN useradd appuser
