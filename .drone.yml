@@ -25,5 +25,6 @@ steps:
     repo: registry.fk.jochum.dev/jo-micro/router
     build_args:
     - DOCKER_IO=registry.fk.jochum.dev/docker_hub_cache
+    - DOCKER_ORG_JO_MICRO=registry.fk.jochum.dev/jo-micro
     - VERSION=${DRONE_TAG:1}
     auto_tag: true
