@@ -17,7 +17,7 @@ var myLogger *logrus.Logger = nil
 var initialized = false
 
 func AppendFlags(flags []cli.Flag) []cli.Flag {
-	return util.AppendFlag(flags, &cli.StringFlag{
+	return util.MergeFlag(flags, &cli.StringFlag{
 		Name:    "router_loglevel",
 		Value:   "info",
 		Usage:   "Logrus log level default 'info', {panic,fatal,error,warn,info,debug,trace} available",
