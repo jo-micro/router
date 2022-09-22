@@ -86,7 +86,7 @@ func main() {
 
 	routerAuthReg := auth2.RouterAuthRegistry()
 
-	flags := ilogger.AppendFlags(routerAuthReg.AppendFlags(auth2.ClientAuthRegistry().AppendFlags([]cli.Flag{
+	flags := ilogger.MergeFlags(routerAuthReg.MergeFlags(auth2.ClientAuthRegistry().MergeFlags([]cli.Flag{
 		// General
 		&cli.BoolFlag{
 			Name:    "router_debugmode",

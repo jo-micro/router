@@ -16,7 +16,7 @@ import (
 var myLogger *logrus.Logger = nil
 var initialized = false
 
-func AppendFlags(flags []cli.Flag) []cli.Flag {
+func MergeFlags(flags []cli.Flag) []cli.Flag {
 	return util.MergeFlag(flags, &cli.StringFlag{
 		Name:    "router_loglevel",
 		Value:   "info",
