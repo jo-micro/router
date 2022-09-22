@@ -15,7 +15,6 @@ import (
 	"go-micro.dev/v4/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"jochum.dev/jo-micro/auth2"
-	auth "jochum.dev/jo-micro/auth2"
 	"jochum.dev/jo-micro/router/internal/ilogger"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
@@ -31,7 +30,7 @@ type JSONRoute struct {
 type Handler struct {
 	service    micro.Service
 	engine     *gin.Engine
-	routerAuth auth.RouterPlugin
+	routerAuth auth2.RouterPlugin
 	routes     map[string]*routerclientpb.RoutesReply_Route
 }
 
@@ -41,7 +40,7 @@ func NewHandler() (*Handler, error) {
 	}, nil
 }
 
-func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth.RouterPlugin, refreshSeconds int) error {
+func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth2.RouterPlugin, refreshSeconds int) error {
 	h.service = service
 	h.engine = engine
 	h.routerAuth = routerAuth
