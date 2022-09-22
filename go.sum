@@ -308,3 +308,5 @@ jochum.dev/jo-micro/auth2 v0.0.3 h1:PmLsCyxefJMtuZYBVUiuUpTN1axko7qKy940FVcW8uQ=
 jochum.dev/jo-micro/auth2 v0.0.3/go.mod h1:z2qub/2K5+C9bpoDImWWPpKFPxds6LQN1Qx6X8c1xEc=
 jochum.dev/jo-micro/auth2 v0.1.0 h1:/uLfWsi7m1JjnrdNbLgpplnfMP9kWPztTTWNSPT+chw=
 jochum.dev/jo-micro/auth2 v0.1.0/go.mod h1:z2qub/2K5+C9bpoDImWWPpKFPxds6LQN1Qx6X8c1xEc=
+jochum.dev/jo-micro/auth2 v0.2.0 h1:48fLUtVx2u5NDlO0Nzm8K8cHUPbOXNNuKG9gg4vVmFM=
+jochum.dev/jo-micro/auth2 v0.2.0/go.mod h1:z2qub/2K5+C9bpoDImWWPpKFPxds6LQN1Qx6X8c1xEc=

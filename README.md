@@ -24,7 +24,7 @@ docker-compose:
 services:
   router:
     restart: unless-stopped
-    image: docker.io/jomicro/router:0.3.3
+    image: docker.io/jomicro/router:0.3.4
     environment:
       - MICRO_TRANSPORT=grpc
       - MICRO_REGISTRY=nats
@@ -46,7 +46,7 @@ services:
 services:
   router:
     restart: unless-stopped
-    image: docker.io/jomicro/router:0.3.3
+    image: docker.io/jomicro/router:0.3.4
     environment:
       - MICRO_AUTH2_CLIENT=jwt
       - MICRO_AUTH2_ROUTER=jwt

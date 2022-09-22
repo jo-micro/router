@@ -27,7 +27,7 @@ func internalService(routerHandler *handler.Handler) {
 	opts := []micro.Option{
 		micro.Name(config.Name + "-internal"),
 		micro.Version(config.Version),
-		micro.WrapHandler(auth2.ClientAuthRegistry().Plugin().Wrapper()),
+		micro.WrapHandler(auth2.ClientAuthRegistry().Wrapper()),
 		micro.Action(func(c *cli.Context) error {
 			if err := auth2.ClientAuthRegistry().Init(c, srv); err != nil {
 				ilogger.Logrus().Fatal(err)
