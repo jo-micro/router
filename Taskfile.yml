@@ -99,4 +99,5 @@ tasks:
     desc: Remove all persistent data
     cmds:
       - podman image rm {{.DOCKER_ORG_JO_MICRO}}/router:latest || exit 0
+      - podman volume rm jo_micro-router_go || exit 0
       - rm -rf $PWD/.task

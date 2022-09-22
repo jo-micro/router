@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	httpServer "github.com/go-micro/plugins/v4/server/http"
 	"jochum.dev/jo-micro/auth2"
+	"jochum.dev/jo-micro/auth2/plugins/verifier/endpointroles"
 	"jochum.dev/jo-micro/router"
 
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
@@ -26,12 +27,25 @@ func internalService(routerHandler *handler.Handler) {
 	opts := []micro.Option{
 		micro.Name(config.Name + "-internal"),
 		micro.Version(config.Version),
+		micro.WrapHandler(auth2.ClientAuthRegistry().Plugin().Wrapper()),
 		micro.Action(func(c *cli.Context) error {
 			if err := auth2.ClientAuthRegistry().Init(c, srv); err != nil {
 				ilogger.Logrus().Fatal(err)
 			}
 
 			routerserverpb.RegisterRouterServerServiceHandler(srv.Server(), routerHandler)
+
+			authVerifier := endpointroles.NewVerifier(
+				endpointroles.WithLogrus(ilogger.Logrus()),
+			)
+			authVerifier.AddRules(
+				endpointroles.RouterRule,
+				endpointroles.NewRule(
+					endpointroles.Endpoint(routerserverpb.RouterServerService.Routes),
+					endpointroles.RolesAllow(auth2.RolesServiceAndAdmin),
+				),
+			)
+			auth2.ClientAuthRegistry().Plugin().SetVerifier(authVerifier)
 
 			r := router.NewHandler(
 				c.String("router_basepath"),
