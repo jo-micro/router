@@ -16,6 +16,8 @@ I'm still working on the implementation of jo-micro/auth2, everything Auth relat
 
 ## Usage
 
+### docker-compose without auth
+
 docker-compose:
 
 ```yaml
@@ -29,8 +31,36 @@ services:
       - MICRO_REGISTRY_ADDRESS=nats:4222
       - MICRO_BROKER=nats
       - MICRO_BROKER_ADDRESS=nats:4222
-      - SERVER_ADDRESS=:8080
-      - LOG_LEVEL=info
+      - MICRO_ROUTER_LISTEN=:8080
+      - MICRO_ROUTER_LOG_LEVEL=info
+
+    ports:
+      - 8080:8080
+    depends_on:
+      - nats
+```
+
+### docker-compose with auth
+
+```yaml
+services:
+  router:
+    restart: unless-stopped
+    image: docker.io/jomicro/router:0.3.0
+    environment:
+      - MICRO_AUTH2_CLIENT=jwt
+      - MICRO_AUTH2_ROUTER=jwt
+      - MICRO_AUTH2_JWT_AUDIENCES="key from task keys inside the auth project"
+      - MICRO_AUTH2_JWT_PRIV_KEY="key from task keys inside the auth project"
+      - MICRO_AUTH2_JWT_PUB_KEY="key from task keys inside the auth project"
+      - MICRO_TRANSPORT=grpc
+      - MICRO_REGISTRY=nats
+      - MICRO_REGISTRY_ADDRESS=nats:4222
+      - MICRO_BROKER=nats
+      - MICRO_BROKER_ADDRESS=nats:4222
+      - MICRO_ROUTER_LISTEN=:8080
+      - MICRO_ROUTER_LOG_LEVEL=info
+
     ports:
       - 8080:8080
     depends_on:
@@ -41,14 +71,12 @@ See [cmd/microrouterd/plugins.go](cmd/microrouterd/plugins.go) for a list of ava
 
 ## Todo
 
-- Add (more) examples.
 - Add support for Streams / WebSockets.
-- Add support for [debug](https://github.com/asim/go-micro/tree/master/debug).
-- Maybe add optional support for [auth](https://github.com/asim/go-micro/blob/master/auth/auth.go).
+- Add support for [debug](https://github.com/asim/go-micro/tree/master/debug)?
 
 ## Service integration examples
 
-Have a look at [internalService](cmd/microrouterd/main.go#L35) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
+Have a look at [internalService](cmd/microrouterd/main.go#L36) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
 
 Here's some code from the microlobby project
 
