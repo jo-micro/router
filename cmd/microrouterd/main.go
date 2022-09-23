@@ -29,7 +29,7 @@ func internalService(routerHandler *handler.Handler) {
 		micro.Version(config.Version),
 		micro.WrapHandler(auth2.ClientAuthRegistry().Wrapper()),
 		micro.Action(func(c *cli.Context) error {
-			if err := auth2.ClientAuthRegistry().Init(c, srv); err != nil {
+			if err := auth2.ClientAuthRegistry().Init(auth2.CliContext(c), auth2.Service(srv), auth2.Logrus(ilogger.Logrus())); err != nil {
 				ilogger.Logrus().Fatal(err)
 			}
 
@@ -132,7 +132,7 @@ func main() {
 			}
 
 			// Initialize the Auth Plugin over RouterAuthRegistry
-			if err := routerAuthReg.Init(c, srv); err != nil {
+			if err := routerAuthReg.Init(auth2.CliContext(c), auth2.Service(srv), auth2.Logrus(ilogger.Logrus())); err != nil {
 				ilogger.Logrus().Fatal(err)
 			}
 
