@@ -48,9 +48,9 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 
 	// Refresh routes for the proxy every 10 seconds
 	go func() {
-		ctx := context.Background()
-
 		for {
+			ctx := context.Background()
+
 			services, err := util.FindByEndpoint(h.service, "RouterClientService.Routes")
 			if err != nil {
 				ilogger.Logrus().Error(err)
