@@ -58,6 +58,12 @@ tasks:
           CLI_ARGS: /scripts/protoc_gen.sh
 
   build:podman:
+    sources:
+      - ./go.sum
+      - ./go.work.sum
+      - ./cmd/microrouterd/**/*.go
+      - ./internal/**/*.go
+      - /*.go
     deps:
       - protoc
     cmds:
