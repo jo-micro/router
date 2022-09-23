@@ -6,10 +6,6 @@ A dynamic router (API Gatway) for go-micro.
 
 It looks for services that host "internal/proto/routerclientpb/routerclientpb.RouterClientService" and ask's them for routes/endpoints, then it registers that endpoints via a proxy method within gin.
 
-## AUTH is WORK IN PROGRESS
-
-I'm still working on the implementation of jo-micro/auth2, everything Auth related my change.
-
 ## Caveats
 
 - gin doesn't allow to delete routes, so if you want to delete a route you have to restart go-micro/router.

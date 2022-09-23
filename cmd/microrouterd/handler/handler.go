@@ -8,11 +8,13 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	libredis "github.com/go-redis/redis/v8"
 
 	limiter "github.com/ulule/limiter/v3"
+	"github.com/ulule/limiter/v3/drivers/store/memory"
 	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 
 	"github.com/gin-gonic/gin"
@@ -53,7 +55,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 	h.routerAuth = routerAuth
 	globalGroup := h.engine.Group("")
 
-	if rlStoreURL != "" {
+	if strings.HasPrefix(rlStoreURL, "redis://") {
 		// Create a redis client.
 		option, err := libredis.ParseURL(rlStoreURL)
 		if err != nil {
@@ -70,6 +72,8 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 			return err
 		}
 		h.rlStore = store
+	} else if rlStoreURL == "memory://" {
+		h.rlStore = memory.NewStore()
 	}
 
 	// Refresh routes for the proxy every 10 seconds

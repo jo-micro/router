@@ -17,7 +17,7 @@ require (
 	github.com/urfave/cli/v2 v2.16.3
 	go-micro.dev/v4 v4.8.1
 	google.golang.org/protobuf v1.28.1
-	jochum.dev/jo-micro/auth2 v0.3.1
+	jochum.dev/jo-micro/auth2 v0.3.2
 )
 
 require (

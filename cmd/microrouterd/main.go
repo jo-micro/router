@@ -116,8 +116,9 @@ func main() {
 		},
 		&cli.StringFlag{
 			Name:    "router_ratelimiter_store_url",
-			Usage:   "Ratelimiter store URL, for example redis://localhost:6379/0. No store = no Endpoints that require a ratelimiter",
+			Usage:   "Ratelimiter store URL, for example redis://localhost:6379/0",
 			EnvVars: []string{"MICRO_ROUTER_RATELIMITER_STORE_URL"},
+			Value:   "memory://",
 		},
 	})))
 
