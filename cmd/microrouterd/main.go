@@ -54,6 +54,7 @@ func internalService(routerHandler *handler.Handler) {
 					router.Method(router.MethodGet),
 					router.Path("/routes"),
 					router.Endpoint(routerserverpb.RouterServerService.Routes),
+					router.RatelimitClientIP("1-S", "50-M", "1000-H"),
 				),
 			)
 			r.RegisterWithServer(srv.Server())
@@ -113,6 +114,11 @@ func main() {
 			EnvVars: []string{"MICRO_ROUTER_LISTEN"},
 			Value:   ":8080",
 		},
+		&cli.StringFlag{
+			Name:    "router_ratelimiter_store_url",
+			Usage:   "Ratelimiter store URL, for example redis://localhost:6379/0. No store = no Endpoints that require a ratelimiter",
+			EnvVars: []string{"MICRO_ROUTER_RATELIMITER_STORE_URL"},
+		},
 	})))
 
 	routerHandler, err := handler.NewHandler()
@@ -144,9 +150,10 @@ func main() {
 				gin.SetMode(gin.ReleaseMode)
 			}
 			r := gin.New()
+			r.ForwardedByClientIP = true
 
 			// Initalize the Handler
-			if err := routerHandler.Init(srv, r, routerAuthReg.Plugin(), c.Int("router_refresh")); err != nil {
+			if err := routerHandler.Init(srv, r, routerAuthReg.Plugin(), c.Int("router_refresh"), c.String("router_ratelimiter_store_url")); err != nil {
 				ilogger.Logrus().Fatal(err)
 			}
 

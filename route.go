@@ -5,25 +5,27 @@ import (
 )
 
 type Route struct {
-	// isGlobal=True == no prefix route
-	IsGlobal     bool
+	IsGlobal     bool // isGlobal=True == no prefix route
 	Method       string
 	Path         string
 	Endpoint     interface{}
 	Params       []string
-	AuthRequired bool
+	AuthRequired bool // Default false
+	// https://github.com/ulule/limiter - default is no rate Limiter at all, put the strictes limit first
+	RatelimitClientIP []string
 }
 
 type Option func(*Route)
 
 func NewRoute(opts ...Option) *Route {
 	route := &Route{
-		IsGlobal:     false,
-		Method:       MethodGet,
-		Path:         "/",
-		Endpoint:     nil,
-		Params:       []string{},
-		AuthRequired: false,
+		IsGlobal:          false,
+		Method:            MethodGet,
+		Path:              "/",
+		Endpoint:          nil,
+		Params:            []string{},
+		AuthRequired:      false,
+		RatelimitClientIP: []string{},
 	}
 
 	for _, o := range opts {
@@ -71,5 +73,11 @@ func Params(n ...string) Option {
 func AuthRequired() Option {
 	return func(o *Route) {
 		o.AuthRequired = true
+	}
+}
+
+func RatelimitClientIP(n ...string) Option {
+	return func(o *Route) {
+		o.RatelimitClientIP = n
 	}
 }

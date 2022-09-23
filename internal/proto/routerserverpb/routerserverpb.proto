@@ -17,6 +17,7 @@ message RoutesReply {
         repeated string params = 3;
         string endpoint = 4;
         bool authRequired = 5;
+        repeated string ratelimitClientIP = 6;
     }
 
     repeated Route routes = 1;

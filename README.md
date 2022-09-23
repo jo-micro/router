@@ -85,7 +85,7 @@ import (
     "jochum.dev/jo-micro/router"
     "github.com/urfave/cli/v2"
     "go-micro.dev/v4"
-    "wz2100.net/microlobby/shared/proto/authservicepb/v1"
+    "jochum.dev/jo-micro/auth2/internal/proto/authpb"
 )
 
 func main() {
@@ -95,52 +95,59 @@ func main() {
         micro.Action(func(c *cli.Context) error {
             s := service.Server()
             r := router.NewHandler(
-                config.RouterURI,
-                router.NewRoute(
-                    router.Method(router.MethodGet),
-                    router.Path("/"),
-                    router.Endpoint(authservicepb.AuthV1Service.UserList),
-                    router.Params("limit", "offset"),
-                    router.AuthRequired(),
-                ),
-                router.NewRoute(
-                    router.Method(router.MethodPost),
-                    router.Path("/login"),
-                    router.Endpoint(authservicepb.AuthV1Service.Login),
-                ),
-                router.NewRoute(
-                    router.Method(router.MethodPost),
-                    router.Path("/register"),
-                    router.Endpoint(authservicepb.AuthV1Service.Register),
-                ),
-                router.NewRoute(
-                    router.Method(router.MethodPost),
-                    router.Path("/refresh"),
-                    router.Endpoint(authservicepb.AuthV1Service.Refresh),
-                ),
-                router.NewRoute(
-                    router.Method(router.MethodDelete),
-                    router.Path("/:userId"),
-                    router.Endpoint(authservicepb.AuthV1Service.UserDelete),
-                    router.Params("userId"),
-                    router.AuthRequired(),
-                ),
-                router.NewRoute(
-                    router.Method(router.MethodGet),
-                    router.Path("/:userId"),
-                    router.Endpoint(authservicepb.AuthV1Service.UserDetail),
-                    router.Params("userId"),
-                    router.AuthRequired(),
-                ),
-                router.NewRoute(
-                    router.Method(router.MethodPut),
-                    router.Path("/:userId/roles"),
-                    router.Endpoint(authservicepb.AuthV1Service.UserUpdateRoles),
-                    router.Params("userId"),
-                    router.AuthRequired(),
-                ),
+              "api/auth/v1",
+              router.NewRoute(
+                router.Method(router.MethodGet),
+                router.Path("/"),
+                router.Endpoint(authpb.AuthService.List),
+                router.Params("limit", "offset"),
+                router.AuthRequired(),
+                router.RatelimitClientIP("1-M"),
+              ),
+              router.NewRoute(
+                router.Method(router.MethodPost),
+                router.Path("/login"),
+                router.Endpoint(authpb.AuthService.Login),
+                router.RatelimitClientIP("10-M", "30-H", "100-D"),
+              ),
+              router.NewRoute(
+                router.Method(router.MethodPost),
+                router.Path("/register"),
+                router.Endpoint(authpb.AuthService.Register),
+                router.RatelimitClientIP("1-M", "10-H", "50-D"),
+              ),
+              router.NewRoute(
+                router.Method(router.MethodPost),
+                router.Path("/refresh"),
+                router.Endpoint(authpb.AuthService.Refresh),
+                router.RatelimitClientIP("1-M", "10-H", "50-D"),
+              ),
+              router.NewRoute(
+                router.Method(router.MethodDelete),
+                router.Path("/:userId"),
+                router.Endpoint(authpb.AuthService.Delete),
+                router.Params("userId"),
+                router.AuthRequired(),
+                router.RatelimitClientIP("10-M"),
+              ),
+              router.NewRoute(
+                router.Method(router.MethodGet),
+                router.Path("/:userId"),
+                router.Endpoint(authpb.AuthService.Detail),
+                router.Params("userId"),
+                router.AuthRequired(),
+                router.RatelimitClientIP("100-M"),
+              ),
+              router.NewRoute(
+                router.Method(router.MethodPut),
+                router.Path("/:userId/roles"),
+                router.Endpoint(authpb.AuthService.UpdateRoles),
+                router.Params("userId"),
+                router.AuthRequired(),
+                router.RatelimitClientIP("1-M"),
+              ),
             )
-            r.RegisterWithServer(s)
+            r.RegisterWithServer(srv.Server())
         }
     )
 }

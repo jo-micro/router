@@ -19,6 +19,7 @@ message RoutesReply {
         string endpoint = 4;
         repeated string params = 5;
         bool authRequired = 6;
+        repeated string ratelimitClientIP = 7;
     }
 
     string routerURI = 1;

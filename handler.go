@@ -25,12 +25,13 @@ func NewHandler(routerURI string, routes ...*Route) *Handler {
 		}
 
 		pbRoutes = append(pbRoutes, &routerclientpb.RoutesReply_Route{
-			IsGlobal:     r.IsGlobal,
-			Method:       r.Method,
-			Path:         r.Path,
-			Endpoint:     util.ReflectFunctionName(r.Endpoint),
-			Params:       r.Params,
-			AuthRequired: r.AuthRequired,
+			IsGlobal:          r.IsGlobal,
+			Method:            r.Method,
+			Path:              r.Path,
+			Endpoint:          util.ReflectFunctionName(r.Endpoint),
+			Params:            r.Params,
+			AuthRequired:      r.AuthRequired,
+			RatelimitClientIP: r.RatelimitClientIP,
 		})
 	}
 

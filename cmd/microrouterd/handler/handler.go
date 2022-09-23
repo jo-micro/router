@@ -7,7 +7,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
+
+	libredis "github.com/go-redis/redis/v8"
+
+	limiter "github.com/ulule/limiter/v3"
+	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 
 	"github.com/gin-gonic/gin"
 	"go-micro.dev/v4"
@@ -32,6 +38,7 @@ type Handler struct {
 	engine     *gin.Engine
 	routerAuth auth2.RouterPlugin
 	routes     map[string]*routerclientpb.RoutesReply_Route
+	rlStore    limiter.Store
 }
 
 func NewHandler() (*Handler, error) {
@@ -40,11 +47,30 @@ func NewHandler() (*Handler, error) {
 	}, nil
 }
 
-func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth2.RouterPlugin, refreshSeconds int) error {
+func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth2.RouterPlugin, refreshSeconds int, rlStoreURL string) error {
 	h.service = service
 	h.engine = engine
 	h.routerAuth = routerAuth
 	globalGroup := h.engine.Group("")
+
+	if rlStoreURL != "" {
+		// Create a redis client.
+		option, err := libredis.ParseURL(rlStoreURL)
+		if err != nil {
+			return err
+		}
+		client := libredis.NewClient(option)
+
+		// Create a store with the redis client.
+		store, err := sredis.NewStoreWithOptions(client, limiter.StoreOptions{
+			Prefix:   "rl",
+			MaxRetry: 10,
+		})
+		if err != nil {
+			return err
+		}
+		h.rlStore = store
+	}
 
 	// Refresh routes for the proxy every 10 seconds
 	go func() {
@@ -84,17 +110,54 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 					}
 
 					// Calculate the pathMethod of the route and register it if it's not registered yet
-					pathMethod := fmt.Sprintf("%s:%s%s", route.GetMethod(), g.BasePath(), route.GetPath())
-					path := fmt.Sprintf("%s%s", g.BasePath(), route.GetPath())
+					pathMethod := fmt.Sprintf("%s:%s%s", route.Method, g.BasePath(), route.Path)
+					path := fmt.Sprintf("%s%s", g.BasePath(), route.Path)
 					if _, ok := h.routes[pathMethod]; !ok {
 						ilogger.Logrus().
 							WithField("service", s.Name).
-							WithField("endpoint", route.GetEndpoint()).
-							WithField("method", route.GetMethod()).
+							WithField("endpoint", route.Endpoint).
+							WithField("method", route.Method).
 							WithField("path", path).
-							Debugf("Found route")
+							WithField("ratelimitClientIP", route.RatelimitClientIP).
+							Debug("found route")
 
-						g.Handle(route.GetMethod(), route.GetPath(), h.proxy(s.Name, route, route.AuthRequired))
+						clientIPRatelimiter := make([]*limiter.Limiter, len(route.RatelimitClientIP))
+						if len(route.RatelimitClientIP) > 0 {
+							if h.rlStore == nil {
+								ilogger.Logrus().
+									WithField("service", s.Name).
+									WithField("endpoint", route.Endpoint).
+									WithField("method", route.Method).
+									WithField("path", path).
+									WithField("ratelimitClientIP", route.RatelimitClientIP).
+									Error("found a route with a limiter but there is no limiter store")
+								continue
+							}
+
+							haveError := false
+							for idx, rate := range route.RatelimitClientIP {
+								rate, err := limiter.NewRateFromFormatted(rate)
+								if err != nil {
+									ilogger.Logrus().
+										WithField("service", s.Name).
+										WithField("endpoint", route.Endpoint).
+										WithField("method", route.Method).
+										WithField("path", path).
+										WithField("ratelimitClientIP", route.RatelimitClientIP).
+										Error(err)
+									haveError = true
+									break
+								}
+
+								clientIPRatelimiter[idx] = limiter.New(h.rlStore, rate)
+							}
+
+							if haveError {
+								continue
+							}
+						}
+
+						g.Handle(route.Method, route.Path, h.proxy(s.Name, route, route.AuthRequired, path, clientIPRatelimiter))
 						h.routes[pathMethod] = route
 						h.routes[pathMethod].Path = path
 					}
@@ -112,8 +175,38 @@ func (h *Handler) Stop() error {
 	return nil
 }
 
-func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Route, authRequired bool) func(*gin.Context) {
+func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Route, authRequired bool, path string, clientIPRatelimiter []*limiter.Limiter) func(*gin.Context) {
 	return func(c *gin.Context) {
+
+		if len(clientIPRatelimiter) > 0 {
+			for idx, l := range clientIPRatelimiter {
+				context, err := l.Get(c, fmt.Sprintf("%s-%s-%s", path, l.Rate.Formatted, c.ClientIP()))
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"status":  http.StatusInternalServerError,
+						"message": "Internal server error",
+					})
+					c.Abort()
+					return
+				}
+
+				if idx == 0 {
+					c.Header("X-RateLimit-Limit", strconv.FormatInt(context.Limit, 10))
+					c.Header("X-RateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
+					c.Header("X-RateLimit-Reset", strconv.FormatInt(context.Reset, 10))
+				}
+
+				if context.Reached {
+					c.JSON(http.StatusTooManyRequests, gin.H{
+						"status":  http.StatusTooManyRequests,
+						"message": "To many requests",
+					})
+					c.Abort()
+					return
+				}
+			}
+		}
+
 		// Map query/path params
 		params := make(map[string]string)
 		for _, p := range route.Params {
@@ -180,7 +273,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			request[pn] = p
 		}
 
-		req := h.service.Client().NewRequest(serviceName, route.GetEndpoint(), request, client.WithContentType("application/json"))
+		req := h.service.Client().NewRequest(serviceName, route.Endpoint, request, client.WithContentType("application/json"))
 
 		// Auth
 		ctx, err := h.routerAuth.ForwardContext(c.Request, c)
@@ -217,11 +310,12 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 func (h *Handler) Routes(ctx context.Context, in *emptypb.Empty, out *routerserverpb.RoutesReply) error {
 	for _, route := range h.routes {
 		out.Routes = append(out.Routes, &routerserverpb.RoutesReply_Route{
-			Method:       route.Method,
-			Path:         route.Path,
-			Params:       route.Params,
-			Endpoint:     route.Endpoint,
-			AuthRequired: route.AuthRequired,
+			Method:            route.Method,
+			Path:              route.Path,
+			Params:            route.Params,
+			Endpoint:          route.Endpoint,
+			AuthRequired:      route.AuthRequired,
+			RatelimitClientIP: route.RatelimitClientIP,
 		})
 	}
 
