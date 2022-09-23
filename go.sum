@@ -312,3 +312,4 @@ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 jochum.dev/jo-micro/auth2 v0.3.0 h1:7r9Vo7/Wlc/tB8sBN4BGQFniOy2x1ekoWI5I4+xBUv0=
 jochum.dev/jo-micro/auth2 v0.3.0/go.mod h1:fSWMvxDct/jhmP1CC5HQTSfklqZRmygO8Zv5qZVuUHg=
+jochum.dev/jo-micro/auth2 v0.3.1/go.mod h1:fSWMvxDct/jhmP1CC5HQTSfklqZRmygO8Zv5qZVuUHg=
