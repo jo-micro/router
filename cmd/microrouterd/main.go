@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	ginlogrus "github.com/toorop/gin-logrus"
 	"github.com/urfave/cli/v2"
@@ -151,6 +152,10 @@ func main() {
 
 			// Add middlewares to gin
 			r.Use(ginlogrus.Logger(ilogger.Logrus()), gin.Recovery())
+
+			r.NoRoute(func(c *gin.Context) {
+				c.JSON(404, gin.H{"code": http.StatusNotFound, "message": "page not found"})
+			})
 
 			// Register gin with micro
 			if err := micro.RegisterHandler(srv.Server(), r); err != nil {

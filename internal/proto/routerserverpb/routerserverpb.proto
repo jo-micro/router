@@ -14,6 +14,9 @@ message RoutesReply {
     message Route {
         string method = 1;
         string path = 2;
+        repeated string params = 3;
+        string endpoint = 4;
+        bool authRequired = 5;
     }
 
     repeated Route routes = 1;

@@ -217,8 +217,11 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 func (h *Handler) Routes(ctx context.Context, in *emptypb.Empty, out *routerserverpb.RoutesReply) error {
 	for _, route := range h.routes {
 		out.Routes = append(out.Routes, &routerserverpb.RoutesReply_Route{
-			Method: route.Method,
-			Path:   route.Path,
+			Method:       route.Method,
+			Path:         route.Path,
+			Params:       route.Params,
+			Endpoint:     route.Endpoint,
+			AuthRequired: route.AuthRequired,
 		})
 	}
 
