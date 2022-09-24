@@ -224,7 +224,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{
 						"errors": []gin.H{
-							gin.H{
+							{
 								"id":      "INTERNAL_SERVER_ERROR",
 								"message": err,
 							},
@@ -243,7 +243,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				if context.Reached {
 					c.JSON(http.StatusTooManyRequests, gin.H{
 						"errors": []gin.H{
-							gin.H{
+							{
 								"id":      "TO_MANY_REQUESTS",
 								"message": "To many requests",
 							},
@@ -308,7 +308,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				if c.ContentType() == "" {
 					c.JSON(http.StatusUnsupportedMediaType, gin.H{
 						"errors": []gin.H{
-							gin.H{
+							{
 								"id":      "UNSUPPORTED_MEDIA_TYPE",
 								"message": "provide a content-type header",
 							},
@@ -337,7 +337,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		if authErr != nil && authRequired {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"errors": []gin.H{
-					gin.H{
+					{
 						"id":      "UNAUTHORIZED",
 						"message": err,
 					},
@@ -350,7 +350,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"errors": []gin.H{
-						gin.H{
+						{
 							"id":      "INTERNAL_SERVER_ERROR",
 							"message": err,
 						},
@@ -362,7 +362,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"errors": []gin.H{
-						gin.H{
+						{
 							"id":      "INTERNAL_SERVER_ERROR",
 							"message": err,
 						},
@@ -377,7 +377,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{
 						"errors": []gin.H{
-							gin.H{
+							{
 								"id":      "INTERNAL_SERVER_ERROR",
 								"message": err,
 							},
@@ -396,7 +396,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				if context.Reached {
 					c.JSON(http.StatusTooManyRequests, gin.H{
 						"errors": []gin.H{
-							gin.H{
+							{
 								"id":      "TO_MANY_REQUESTS",
 								"message": "To many requests",
 							},
@@ -422,7 +422,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			}
 			c.JSON(code, gin.H{
 				"errors": []gin.H{
-					gin.H{
+					{
 						"id":      id,
 						"message": pErr.Detail,
 					},
