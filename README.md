@@ -74,7 +74,7 @@ See [cmd/microrouterd/plugins.go](cmd/microrouterd/plugins.go) for a list of ava
 
 Have a look at [internalService](cmd/microrouterd/main.go#L51 ), [jo-micro/auth2](https://git.jochum.dev/jo-micro/auth2/src/branch/main/cmd/microauth2sqld/main.go#L319) or the author's FOSS project [microlobby](https://github.com/pcdummy/microlobby).
 
-Here's some code from the microlobby project
+Here's some code from the jo-micro/auth2 project
 
 ```go
 import (
@@ -90,9 +90,8 @@ func main() {
     service.Init(
         micro.Action(func(c *cli.Context) error {
             s := service.Server()
-            // Register with https://jochum.dev/jo-micro/router
             r := router.NewHandler(
-              c.String("auth2_sqld_router_basepath"),
+              "api/auth/v1",
               router.NewRoute(
                 router.Method(router.MethodGet),
                 router.Path("/"),

@@ -329,9 +329,12 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		req := h.service.Client().NewRequest(serviceName, route.Endpoint, request, client.WithContentType("application/json"))
 
 		// Auth
-		u, err := h.routerAuth.Inspect(c.Request)
-		var ctx context.Context
-		if err != nil && authRequired {
+		u, authErr := h.routerAuth.Inspect(c.Request)
+		var (
+			ctx context.Context
+			err error
+		)
+		if authErr != nil && authRequired {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"errors": []gin.H{
 					gin.H{
@@ -342,6 +345,18 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			})
 			c.Abort()
 			return
+		} else if authErr != nil {
+			ctx, err = h.routerAuth.ForwardContext(auth2.AnonUser, c.Request, c)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"errors": []gin.H{
+						gin.H{
+							"id":      "INTERNAL_SERVER_ERROR",
+							"message": err,
+						},
+					},
+				})
+			}
 		} else {
 			ctx, err = h.routerAuth.ForwardContext(u, c.Request, c)
 			if err != nil {
@@ -356,7 +371,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			}
 		}
 
-		if len(userRatelimiter) > 0 {
+		if authErr == nil && len(userRatelimiter) > 0 {
 			for idx, l := range userRatelimiter {
 				context, err := l.Get(c, fmt.Sprintf("%s-%s-%s", path, l.Rate.Formatted, u.Id))
 				if err != nil {
