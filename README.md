@@ -90,8 +90,9 @@ func main() {
     service.Init(
         micro.Action(func(c *cli.Context) error {
             s := service.Server()
+            // Register with https://jochum.dev/jo-micro/router
             r := router.NewHandler(
-              "api/auth/v1",
+              c.String("auth2_sqld_router_basepath"),
               router.NewRoute(
                 router.Method(router.MethodGet),
                 router.Path("/"),
@@ -99,12 +100,13 @@ func main() {
                 router.Params("limit", "offset"),
                 router.AuthRequired(),
                 router.RatelimitClientIP("1-M"),
+                router.RatelimitUser("1-M"),
               ),
               router.NewRoute(
                 router.Method(router.MethodPost),
                 router.Path("/login"),
                 router.Endpoint(authpb.AuthService.Login),
-                router.RatelimitClientIP("10-M", "30-H", "100-D"),
+                router.RatelimitClientIP("1-S", "10-M", "30-H", "100-D"),
               ),
               router.NewRoute(
                 router.Method(router.MethodPost),
@@ -117,6 +119,7 @@ func main() {
                 router.Path("/refresh"),
                 router.Endpoint(authpb.AuthService.Refresh),
                 router.RatelimitClientIP("1-M", "10-H", "50-D"),
+                router.RatelimitUser("1-M", "10-H", "50-D"),
               ),
               router.NewRoute(
                 router.Method(router.MethodDelete),
@@ -124,7 +127,8 @@ func main() {
                 router.Endpoint(authpb.AuthService.Delete),
                 router.Params("userId"),
                 router.AuthRequired(),
-                router.RatelimitClientIP("10-M"),
+                router.RatelimitClientIP("1-S", "10-M"),
+                router.RatelimitUser("1-S", "10-M"),
               ),
               router.NewRoute(
                 router.Method(router.MethodGet),
@@ -133,6 +137,7 @@ func main() {
                 router.Params("userId"),
                 router.AuthRequired(),
                 router.RatelimitClientIP("100-M"),
+                router.RatelimitUser("100-M"),
               ),
               router.NewRoute(
                 router.Method(router.MethodPut),
@@ -141,10 +146,11 @@ func main() {
                 router.Params("userId"),
                 router.AuthRequired(),
                 router.RatelimitClientIP("1-M"),
+                router.RatelimitUser("1-M"),
               ),
             )
-            r.RegisterWithServer(srv.Server())
-        }
+            r.RegisterWithServer(s)
+        })
     )
 }
 ```
