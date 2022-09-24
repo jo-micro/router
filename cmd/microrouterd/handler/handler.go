@@ -445,6 +445,7 @@ func (h *Handler) Routes(ctx context.Context, in *emptypb.Empty, out *routerserv
 			Endpoint:          route.Endpoint,
 			AuthRequired:      route.AuthRequired,
 			RatelimitClientIP: route.RatelimitClientIP,
+			ReatelimitUser:    route.RatelimitUser,
 		})
 	}
 
