@@ -162,7 +162,7 @@ func main() {
 			r.Use(ginlogrus.Logger(ilogger.Logrus()), gin.Recovery())
 
 			r.NoRoute(func(c *gin.Context) {
-				c.JSON(404, gin.H{"code": http.StatusNotFound, "message": "page not found"})
+				c.JSON(http.StatusNotFound, gin.H{"errors": []gin.H{{"id": "NOT_FOUND", "message": "page not found"}}})
 			})
 
 			// Register gin with micro
