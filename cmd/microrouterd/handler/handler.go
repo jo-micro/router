@@ -219,7 +219,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 	return func(c *gin.Context) {
 
 		if len(clientIPRatelimiter) > 0 {
-			for idx, l := range clientIPRatelimiter {
+			for _, l := range clientIPRatelimiter {
 				context, err := l.Get(c, fmt.Sprintf("%s-%s-%s", path, l.Rate.Formatted, c.ClientIP()))
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{
@@ -234,11 +234,9 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 					return
 				}
 
-				if idx == 0 {
-					c.Header("X-ClientIPRateLimit-Limit", strconv.FormatInt(context.Limit, 10))
-					c.Header("X-ClientIPRateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
-					c.Header("X-ClientIPRateLimit-Reset", strconv.FormatInt(context.Reset, 10))
-				}
+				c.Header("X-ClientIPRateLimit-Limit", strconv.FormatInt(context.Limit, 10))
+				c.Header("X-ClientIPRateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
+				c.Header("X-ClientIPRateLimit-Reset", strconv.FormatInt(context.Reset, 10))
 
 				if context.Reached {
 					c.JSON(http.StatusTooManyRequests, gin.H{
@@ -372,7 +370,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		}
 
 		if authErr == nil && len(userRatelimiter) > 0 {
-			for idx, l := range userRatelimiter {
+			for _, l := range userRatelimiter {
 				context, err := l.Get(c, fmt.Sprintf("%s-%s-%s", path, l.Rate.Formatted, u.Id))
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{
@@ -387,11 +385,9 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 					return
 				}
 
-				if idx == 0 {
-					c.Header("X-UserRateLimit-Limit", strconv.FormatInt(context.Limit, 10))
-					c.Header("X-UserRateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
-					c.Header("X-UserRateLimit-Reset", strconv.FormatInt(context.Reset, 10))
-				}
+				c.Header("X-UserRateLimit-Limit", strconv.FormatInt(context.Limit, 10))
+				c.Header("X-UserRateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
+				c.Header("X-UserRateLimit-Reset", strconv.FormatInt(context.Reset, 10))
 
 				if context.Reached {
 					c.JSON(http.StatusTooManyRequests, gin.H{
