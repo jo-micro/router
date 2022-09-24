@@ -13,6 +13,7 @@ type Route struct {
 	AuthRequired bool // Default false
 	// https://github.com/ulule/limiter - default is no rate Limiter at all, put the strictes limit first
 	RatelimitClientIP []string
+	RatelimitUser     []string
 }
 
 type Option func(*Route)
@@ -26,6 +27,7 @@ func NewRoute(opts ...Option) *Route {
 		Params:            []string{},
 		AuthRequired:      false,
 		RatelimitClientIP: []string{},
+		RatelimitUser:     []string{},
 	}
 
 	for _, o := range opts {
@@ -79,5 +81,11 @@ func AuthRequired() Option {
 func RatelimitClientIP(n ...string) Option {
 	return func(o *Route) {
 		o.RatelimitClientIP = n
+	}
+}
+
+func RatelimitUser(n ...string) Option {
+	return func(o *Route) {
+		o.RatelimitUser = n
 	}
 }

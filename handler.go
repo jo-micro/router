@@ -32,6 +32,7 @@ func NewHandler(routerURI string, routes ...*Route) *Handler {
 			Params:            r.Params,
 			AuthRequired:      r.AuthRequired,
 			RatelimitClientIP: r.RatelimitClientIP,
+			RatelimitUser:     r.RatelimitUser,
 		})
 	}
 

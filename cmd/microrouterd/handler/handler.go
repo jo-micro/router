@@ -134,7 +134,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 									WithField("method", route.Method).
 									WithField("path", path).
 									WithField("ratelimitClientIP", route.RatelimitClientIP).
-									Error("found a route with a limiter but there is no limiter store")
+									Error("found a route with a clientip limiter but there is no limiter store")
 								continue
 							}
 
@@ -161,7 +161,43 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 							}
 						}
 
-						g.Handle(route.Method, route.Path, h.proxy(s.Name, route, route.AuthRequired, path, clientIPRatelimiter))
+						userRatelimiter := make([]*limiter.Limiter, len(route.RatelimitUser))
+						if route.AuthRequired && len(route.RatelimitUser) > 0 {
+							if h.rlStore == nil {
+								ilogger.Logrus().
+									WithField("service", s.Name).
+									WithField("endpoint", route.Endpoint).
+									WithField("method", route.Method).
+									WithField("path", path).
+									WithField("ratelimitUser", route.RatelimitUser).
+									Error("found a route with a user limiter but there is no limiter store")
+								continue
+							}
+
+							haveError := false
+							for idx, rate := range route.RatelimitUser {
+								rate, err := limiter.NewRateFromFormatted(rate)
+								if err != nil {
+									ilogger.Logrus().
+										WithField("service", s.Name).
+										WithField("endpoint", route.Endpoint).
+										WithField("method", route.Method).
+										WithField("path", path).
+										WithField("ratelimitUser", route.RatelimitUser).
+										Error(err)
+									haveError = true
+									break
+								}
+
+								userRatelimiter[idx] = limiter.New(h.rlStore, rate)
+							}
+
+							if haveError {
+								continue
+							}
+						}
+
+						g.Handle(route.Method, route.Path, h.proxy(s.Name, route, route.AuthRequired, path, clientIPRatelimiter, userRatelimiter))
 						h.routes[pathMethod] = route
 						h.routes[pathMethod].Path = path
 					}
@@ -179,7 +215,7 @@ func (h *Handler) Stop() error {
 	return nil
 }
 
-func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Route, authRequired bool, path string, clientIPRatelimiter []*limiter.Limiter) func(*gin.Context) {
+func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Route, authRequired bool, path string, clientIPRatelimiter []*limiter.Limiter, userRatelimiter []*limiter.Limiter) func(*gin.Context) {
 	return func(c *gin.Context) {
 
 		if len(clientIPRatelimiter) > 0 {
@@ -187,23 +223,31 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				context, err := l.Get(c, fmt.Sprintf("%s-%s-%s", path, l.Rate.Formatted, c.ClientIP()))
 				if err != nil {
 					c.JSON(http.StatusInternalServerError, gin.H{
-						"status":  http.StatusInternalServerError,
-						"message": "Internal server error",
+						"errors": []gin.H{
+							gin.H{
+								"id":      "INTERNAL_SERVER_ERROR",
+								"message": err,
+							},
+						},
 					})
 					c.Abort()
 					return
 				}
 
 				if idx == 0 {
-					c.Header("X-RateLimit-Limit", strconv.FormatInt(context.Limit, 10))
-					c.Header("X-RateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
-					c.Header("X-RateLimit-Reset", strconv.FormatInt(context.Reset, 10))
+					c.Header("X-ClientIPRateLimit-Limit", strconv.FormatInt(context.Limit, 10))
+					c.Header("X-ClientIPRateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
+					c.Header("X-ClientIPRateLimit-Reset", strconv.FormatInt(context.Reset, 10))
 				}
 
 				if context.Reached {
 					c.JSON(http.StatusTooManyRequests, gin.H{
-						"status":  http.StatusTooManyRequests,
-						"message": "To many requests",
+						"errors": []gin.H{
+							gin.H{
+								"id":      "TO_MANY_REQUESTS",
+								"message": "To many requests",
+							},
+						},
 					})
 					c.Abort()
 					return
@@ -263,9 +307,14 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			} else {
 				if c.ContentType() == "" {
 					c.JSON(http.StatusUnsupportedMediaType, gin.H{
-						"status":  http.StatusUnsupportedMediaType,
-						"message": "provide a content-type header",
+						"errors": []gin.H{
+							gin.H{
+								"id":      "UNSUPPORTED_MEDIA_TYPE",
+								"message": "provide a content-type header",
+							},
+						},
 					})
+					c.Abort()
 					return
 				}
 				c.ShouldBind(&request)
@@ -280,13 +329,68 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		req := h.service.Client().NewRequest(serviceName, route.Endpoint, request, client.WithContentType("application/json"))
 
 		// Auth
-		ctx, err := h.routerAuth.ForwardContext(c.Request, c)
+		u, err := h.routerAuth.Inspect(c.Request)
+		var ctx context.Context
 		if err != nil && authRequired {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  http.StatusUnauthorized,
-				"message": err,
+				"errors": []gin.H{
+					gin.H{
+						"id":      "UNAUTHORIZED",
+						"message": err,
+					},
+				},
 			})
+			c.Abort()
 			return
+		} else {
+			ctx, err = h.routerAuth.ForwardContext(u, c.Request, c)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"errors": []gin.H{
+						gin.H{
+							"id":      "INTERNAL_SERVER_ERROR",
+							"message": err,
+						},
+					},
+				})
+			}
+		}
+
+		if len(userRatelimiter) > 0 {
+			for idx, l := range userRatelimiter {
+				context, err := l.Get(c, fmt.Sprintf("%s-%s-%s", path, l.Rate.Formatted, u.Id))
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"errors": []gin.H{
+							gin.H{
+								"id":      "INTERNAL_SERVER_ERROR",
+								"message": err,
+							},
+						},
+					})
+					c.Abort()
+					return
+				}
+
+				if idx == 0 {
+					c.Header("X-UserRateLimit-Limit", strconv.FormatInt(context.Limit, 10))
+					c.Header("X-UserRateLimit-Remaining", strconv.FormatInt(context.Remaining, 10))
+					c.Header("X-UserRateLimit-Reset", strconv.FormatInt(context.Reset, 10))
+				}
+
+				if context.Reached {
+					c.JSON(http.StatusTooManyRequests, gin.H{
+						"errors": []gin.H{
+							gin.H{
+								"id":      "TO_MANY_REQUESTS",
+								"message": "To many requests",
+							},
+						},
+					})
+					c.Abort()
+					return
+				}
+			}
 		}
 
 		// remote call
@@ -297,13 +401,19 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 
 			pErr := errors.FromError(err)
 			code := int(http.StatusInternalServerError)
+			id := pErr.Id
 			if pErr.Code != 0 {
 				code = int(pErr.Code)
 			}
 			c.JSON(code, gin.H{
-				"status":  code,
-				"message": pErr.Detail,
+				"errors": []gin.H{
+					gin.H{
+						"id":      id,
+						"message": pErr.Detail,
+					},
+				},
 			})
+			c.Abort()
 			return
 		}
 

@@ -20,6 +20,7 @@ message RoutesReply {
         repeated string params = 5;
         bool authRequired = 6;
         repeated string ratelimitClientIP = 7;
+        repeated string ratelimitUser = 8;
     }
 
     string routerURI = 1;
