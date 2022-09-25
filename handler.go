@@ -2,29 +2,95 @@ package router
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
+	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4/server"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"jochum.dev/jo-micro/components"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
 	"jochum.dev/jo-micro/router/internal/util"
 )
 
+const Name = "router"
+
 // Handler is the handler for jochum.dev/jo-micro/router/proto/routerpb.RrouterService
 type Handler struct {
-	routerURI string
-	routes    []*routerclientpb.RoutesReply_Route
+	initialized bool
+	routerURI   string
+	routes      []*routerclientpb.RoutesReply_Route
 }
 
 // NewHandler returns a new dynrouterpb Handler
-func NewHandler(routerURI string, routes ...*Route) *Handler {
-	pbRoutes := []*routerclientpb.RoutesReply_Route{}
+func New() *Handler {
+	return &Handler{initialized: false, routes: []*routerclientpb.RoutesReply_Route{}}
+}
+
+func Must(ctx context.Context) *Handler {
+	return components.Must(ctx).Must(Name).(*Handler)
+}
+
+func MustReg(cReg *components.Components) *Handler {
+	return cReg.Must(Name).(*Handler)
+}
+
+func (h *Handler) Name() string {
+	return Name
+}
+
+func (h *Handler) Priority() int {
+	return 1000
+}
+
+func (h *Handler) Initialized() bool {
+	return h.initialized
+}
+
+func (h *Handler) Init(r *components.Components, cli *cli.Context) error {
+	if h.initialized {
+		return nil
+	}
+
+	h.routerURI = cli.String(fmt.Sprintf("%s_router_basepath", strings.ToLower(r.FlagPrefix())))
+
+	h.RegisterWithServer(r.Service().Server())
+
+	h.initialized = true
+	return nil
+}
+
+func (h *Handler) Stop() error {
+	return nil
+}
+
+func (h *Handler) Flags(r *components.Components) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
+			Name:    fmt.Sprintf("%s_router_basepath", strings.ToLower(r.FlagPrefix())),
+			Usage:   "Router basepath",
+			EnvVars: []string{fmt.Sprintf("%s_ROUTER_BASEPATH", strings.ToUpper(r.FlagPrefix()))},
+			Value:   fmt.Sprintf("api/v1/%s", strings.ToLower(r.FlagPrefix())),
+		},
+	}
+}
+
+func (h *Handler) Health(context context.Context) error {
+	return nil
+}
+
+func (h *Handler) WrapHandlerFunc(ctx context.Context, req server.Request, rsp interface{}) error {
+	return nil
+}
+
+func (h *Handler) Add(routes ...*Route) {
 	for _, r := range routes {
 		// NewRoute returns nil if no Endpoint has been specified, ignore these here
 		if r == nil {
 			continue
 		}
 
-		pbRoutes = append(pbRoutes, &routerclientpb.RoutesReply_Route{
+		h.routes = append(h.routes, &routerclientpb.RoutesReply_Route{
 			IsGlobal:          r.IsGlobal,
 			Method:            r.Method,
 			Path:              r.Path,
@@ -35,8 +101,6 @@ func NewHandler(routerURI string, routes ...*Route) *Handler {
 			RatelimitUser:     r.RatelimitUser,
 		})
 	}
-
-	return &Handler{routerURI, pbRoutes}
 }
 
 // RegisterWithServer registers this Handler with a server

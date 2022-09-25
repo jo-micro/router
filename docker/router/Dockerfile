@@ -22,7 +22,6 @@ LABEL maintainer="René Jochum <rene@jochum.dev>"
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /usr/local/bin/microrouterd /usr/local/bin/microrouterd
-RUN chmod +x /usr/local/bin/microrouterd
 
 # Run as appuser
 USER appuser

@@ -5,6 +5,6 @@ var (
 )
 
 const (
-	Name    = "go.micro.router"
+	Name    = "jo.micro.router"
 	PkgPath = "jochum.dev/jo-micro/router"
 )

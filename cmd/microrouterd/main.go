@@ -142,6 +142,7 @@ func main() {
 			// Initialize the Auth Plugin over RouterAuthRegistry
 			if err := routerAuthReg.Init(auth2.CliContext(c), auth2.Service(srv), auth2.Logrus(ilogger.Logrus())); err != nil {
 				ilogger.Logrus().Fatal(err)
+				return err
 			}
 
 			// Initialize GIN
@@ -156,6 +157,7 @@ func main() {
 			// Initalize the Handler
 			if err := routerHandler.Init(srv, r, routerAuthReg.Plugin(), c.Int("router_refresh"), c.String("router_ratelimiter_store_url")); err != nil {
 				ilogger.Logrus().Fatal(err)
+				return err
 			}
 
 			// Add middlewares to gin
@@ -168,6 +170,7 @@ func main() {
 			// Register gin with micro
 			if err := micro.RegisterHandler(srv.Server(), r); err != nil {
 				ilogger.Logrus().Fatal(err)
+				return err
 			}
 
 			return nil
