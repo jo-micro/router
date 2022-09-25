@@ -18,12 +18,14 @@ import (
 	sredis "github.com/ulule/limiter/v3/drivers/store/redis"
 
 	"github.com/gin-gonic/gin"
-	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 	"go-micro.dev/v4/errors"
+	"go-micro.dev/v4/logger"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"jochum.dev/jo-micro/auth2"
-	"jochum.dev/jo-micro/router/internal/ilogger"
+	"jochum.dev/jo-micro/components"
+	"jochum.dev/jo-micro/logruscomponent"
+	"jochum.dev/jo-micro/router"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
 	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 	"jochum.dev/jo-micro/router/internal/util"
@@ -36,23 +38,21 @@ type JSONRoute struct {
 
 // Handler is the handler for the proxy
 type Handler struct {
-	service    micro.Service
-	engine     *gin.Engine
-	routerAuth auth2.RouterPlugin
-	routes     map[string]*routerclientpb.RoutesReply_Route
-	rlStore    limiter.Store
+	cReg    *components.Registry
+	engine  *gin.Engine
+	routes  map[string]*routerclientpb.RoutesReply_Route
+	rlStore limiter.Store
 }
 
-func NewHandler() (*Handler, error) {
+func New() *Handler {
 	return &Handler{
 		routes: make(map[string]*routerclientpb.RoutesReply_Route),
-	}, nil
+	}
 }
 
-func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth auth2.RouterPlugin, refreshSeconds int, rlStoreURL string) error {
-	h.service = service
+func (h *Handler) Init(r *components.Registry, engine *gin.Engine, refreshSeconds int, rlStoreURL string) error {
+	h.cReg = r
 	h.engine = engine
-	h.routerAuth = routerAuth
 	globalGroup := h.engine.Group("")
 
 	if strings.HasPrefix(rlStoreURL, "redis://") {
@@ -78,26 +78,28 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 
 	// Refresh routes for the proxy every 10 seconds
 	go func() {
+		logger := logruscomponent.MustReg(h.cReg).Logger()
+
 		for {
 			ctx := context.Background()
 
-			services, err := util.FindByEndpoint(h.service, "RouterClientService.Routes")
+			services, err := util.FindByEndpoint(h.cReg.Service(), "RouterClientService.Routes")
 			if err != nil {
-				ilogger.Logrus().Error(err)
+				logger.Error(err)
 				continue
 			}
 
 			for _, s := range services {
-				ilogger.Logrus().WithField("service", s.Name).Tracef("Found service")
-				client := routerclientpb.NewRouterClientService(s.Name, h.service.Client())
-				sCtx, err := auth2.ClientAuthRegistry().Plugin().ServiceContext(ctx)
+				logger.WithField("service", s.Name).Tracef("Found service")
+				client := routerclientpb.NewRouterClientService(s.Name, h.cReg.Service().Client())
+				sCtx, err := auth2.ClientAuthMustReg(h.cReg).Plugin().ServiceContext(ctx)
 				if err != nil {
-					ilogger.Logrus().Error(err)
+					logger.Error(err)
 					continue
 				}
 				resp, err := client.Routes(sCtx, &emptypb.Empty{})
 				if err != nil {
-					ilogger.Logrus().Error(err)
+					logger.Error(err)
 					// failure in getting routes, silently ignore
 					continue
 				}
@@ -117,7 +119,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 					pathMethod := fmt.Sprintf("%s:%s%s", route.Method, g.BasePath(), route.Path)
 					path := fmt.Sprintf("%s%s", g.BasePath(), route.Path)
 					if _, ok := h.routes[pathMethod]; !ok {
-						ilogger.Logrus().
+						logger.
 							WithField("service", s.Name).
 							WithField("endpoint", route.Endpoint).
 							WithField("method", route.Method).
@@ -128,7 +130,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 						clientIPRatelimiter := make([]*limiter.Limiter, len(route.RatelimitClientIP))
 						if len(route.RatelimitClientIP) > 0 {
 							if h.rlStore == nil {
-								ilogger.Logrus().
+								logger.
 									WithField("service", s.Name).
 									WithField("endpoint", route.Endpoint).
 									WithField("method", route.Method).
@@ -142,7 +144,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 							for idx, rate := range route.RatelimitClientIP {
 								rate, err := limiter.NewRateFromFormatted(rate)
 								if err != nil {
-									ilogger.Logrus().
+									logger.
 										WithField("service", s.Name).
 										WithField("endpoint", route.Endpoint).
 										WithField("method", route.Method).
@@ -164,7 +166,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 						userRatelimiter := make([]*limiter.Limiter, len(route.RatelimitUser))
 						if route.AuthRequired && len(route.RatelimitUser) > 0 {
 							if h.rlStore == nil {
-								ilogger.Logrus().
+								logger.
 									WithField("service", s.Name).
 									WithField("endpoint", route.Endpoint).
 									WithField("method", route.Method).
@@ -178,7 +180,7 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 							for idx, rate := range route.RatelimitUser {
 								rate, err := limiter.NewRateFromFormatted(rate)
 								if err != nil {
-									ilogger.Logrus().
+									logger.
 										WithField("service", s.Name).
 										WithField("endpoint", route.Endpoint).
 										WithField("method", route.Method).
@@ -207,6 +209,16 @@ func (h *Handler) Init(service micro.Service, engine *gin.Engine, routerAuth aut
 			time.Sleep(time.Duration(refreshSeconds) * time.Second)
 		}
 	}()
+
+	r2 := router.MustReg(h.cReg)
+	r2.Add(
+		router.NewRoute(
+			router.Method(router.MethodGet),
+			router.Path("/routes"),
+			router.Endpoint(routerserverpb.RouterServerService.Routes),
+			router.RatelimitClientIP("1-S", "50-M", "1000-H"),
+		),
+	)
 
 	return nil
 }
@@ -324,10 +336,10 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			request[pn] = p
 		}
 
-		req := h.service.Client().NewRequest(serviceName, route.Endpoint, request, client.WithContentType("application/json"))
+		req := h.cReg.Service().Client().NewRequest(serviceName, route.Endpoint, request, client.WithContentType("application/json"))
 
 		// Auth
-		u, authErr := h.routerAuth.Inspect(c.Request)
+		u, authErr := auth2.RouterAuthMust(c).Plugin().Inspect(c.Request)
 		var (
 			ctx context.Context
 			err error
@@ -344,7 +356,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			c.Abort()
 			return
 		} else if authErr != nil {
-			ctx, err = h.routerAuth.ForwardContext(auth2.AnonUser, c.Request, c)
+			ctx, err = auth2.RouterAuthMust(c).Plugin().ForwardContext(auth2.AnonUser, c.Request, c)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"errors": []gin.H{
@@ -356,7 +368,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				})
 			}
 		} else {
-			ctx, err = h.routerAuth.ForwardContext(u, c.Request, c)
+			ctx, err = auth2.RouterAuthMust(c).Plugin().ForwardContext(u, c.Request, c)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"errors": []gin.H{
@@ -406,9 +418,9 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 
 		// remote call
 		var response json.RawMessage
-		err = h.service.Client().Call(ctx, req, &response)
+		err = h.cReg.Service().Client().Call(ctx, req, &response)
 		if err != nil {
-			ilogger.Logrus().Error(err)
+			logger.Error(err)
 
 			pErr := errors.FromError(err)
 			code := int(http.StatusInternalServerError)

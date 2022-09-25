@@ -31,7 +31,7 @@ func Must(ctx context.Context) *Handler {
 	return components.Must(ctx).Must(Name).(*Handler)
 }
 
-func MustReg(cReg *components.Components) *Handler {
+func MustReg(cReg *components.Registry) *Handler {
 	return cReg.Must(Name).(*Handler)
 }
 
@@ -47,7 +47,7 @@ func (h *Handler) Initialized() bool {
 	return h.initialized
 }
 
-func (h *Handler) Init(r *components.Components, cli *cli.Context) error {
+func (h *Handler) Init(r *components.Registry, cli *cli.Context) error {
 	if h.initialized {
 		return nil
 	}
@@ -64,7 +64,7 @@ func (h *Handler) Stop() error {
 	return nil
 }
 
-func (h *Handler) Flags(r *components.Components) []cli.Flag {
+func (h *Handler) Flags(r *components.Registry) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:    fmt.Sprintf("%s_router_basepath", strings.ToLower(r.FlagPrefix())),
