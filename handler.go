@@ -27,10 +27,6 @@ func New() *Handler {
 	return &Handler{initialized: false, routes: []*routerclientpb.RoutesReply_Route{}}
 }
 
-func Must(ctx context.Context) *Handler {
-	return components.Must(ctx).Must(Name).(*Handler)
-}
-
 func MustReg(cReg *components.Registry) *Handler {
 	return cReg.Must(Name).(*Handler)
 }

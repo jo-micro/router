@@ -339,7 +339,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 		req := h.cReg.Service().Client().NewRequest(serviceName, route.Endpoint, request, client.WithContentType("application/json"))
 
 		// Auth
-		u, authErr := auth2.RouterAuthMust(c).Plugin().Inspect(c.Request)
+		u, authErr := auth2.RouterAuthMustReg(h.cReg).Plugin().Inspect(c.Request)
 		var (
 			ctx context.Context
 			err error
@@ -356,7 +356,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 			c.Abort()
 			return
 		} else if authErr != nil {
-			ctx, err = auth2.RouterAuthMust(c).Plugin().ForwardContext(auth2.AnonUser, c.Request, c)
+			ctx, err = auth2.RouterAuthMustReg(h.cReg).Plugin().ForwardContext(auth2.AnonUser, c.Request, c)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"errors": []gin.H{
@@ -368,7 +368,7 @@ func (h *Handler) proxy(serviceName string, route *routerclientpb.RoutesReply_Ro
 				})
 			}
 		} else {
-			ctx, err = auth2.RouterAuthMust(c).Plugin().ForwardContext(u, c.Request, c)
+			ctx, err = auth2.RouterAuthMustReg(h.cReg).Plugin().ForwardContext(u, c.Request, c)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"errors": []gin.H{
