@@ -8,7 +8,10 @@ import (
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4/server"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"jochum.dev/jo-micro/auth2"
+	"jochum.dev/jo-micro/auth2/plugins/verifier/endpointroles"
 	"jochum.dev/jo-micro/components"
+	"jochum.dev/jo-micro/logruscomponent"
 	"jochum.dev/jo-micro/router/internal/proto/routerclientpb"
 	"jochum.dev/jo-micro/router/internal/util"
 )
@@ -49,6 +52,19 @@ func (h *Handler) Init(r *components.Registry, cli *cli.Context) error {
 	}
 
 	h.routerURI = cli.String(fmt.Sprintf("%s_router_basepath", strings.ToLower(r.FlagPrefix())))
+
+	if _, err := r.Get(auth2.ClientAuthName); err != nil {
+		authVerifier := endpointroles.NewVerifier(
+			endpointroles.WithLogrus(logruscomponent.MustReg(r).Logger()),
+		)
+		authVerifier.AddRules(
+			endpointroles.NewRule(
+				endpointroles.Endpoint(routerclientpb.RouterClientService.Routes),
+				endpointroles.RolesAllow([]string{auth2.ROLE_SERVICE}),
+			),
+		)
+		auth2.ClientAuthMustReg(r).Plugin().AddVerifier(authVerifier)
+	}
 
 	h.RegisterWithServer(r.Service().Server())
 

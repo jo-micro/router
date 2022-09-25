@@ -225,7 +225,6 @@ func (h *Handler) Init(r *components.Registry, engine *gin.Engine, refreshSecond
 		endpointroles.WithLogrus(logruscomponent.MustReg(h.cReg).Logger()),
 	)
 	authVerifier.AddRules(
-		endpointroles.RouterRule,
 		endpointroles.NewRule(
 			endpointroles.Endpoint(routerserverpb.RouterServerService.Routes),
 			endpointroles.RolesAllow(auth2.RolesServiceAndAdmin),
