@@ -17,7 +17,7 @@ require (
 	github.com/urfave/cli/v2 v2.16.3
 	go-micro.dev/v4 v4.8.1
 	google.golang.org/protobuf v1.28.1
-	jochum.dev/jo-micro/auth2 v0.3.3
+	jochum.dev/jo-micro/auth2 v0.4.0
 )
 
 require (
@@ -99,7 +99,7 @@ require (
 	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.12 // indirect
-	google.golang.org/genproto v0.0.0-20220921223823-23cae91e6737 // indirect
+	google.golang.org/genproto v0.0.0-20220923205249-dd2d53f1fffc // indirect
 	google.golang.org/grpc v1.49.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

@@ -1848,6 +1848,7 @@ google.golang.org/genproto v0.0.0-20220111164026-67b88f271998/go.mod h1:5CzLGKJ6
 google.golang.org/genproto v0.0.0-20220314164441-57ef72a4c106/go.mod h1:hAL49I2IFola2sVEjAn7MEwsja0xp51I0tlGAf9hz4E=
 google.golang.org/genproto v0.0.0-20220921223823-23cae91e6737 h1:K1zaaMdYBXRyX+cwFnxj7M6zwDyumLQMZ5xqwGvjreQ=
 google.golang.org/genproto v0.0.0-20220921223823-23cae91e6737/go.mod h1:2r/26NEF3bFmT3eC3aZreahSal0C3Shl8Gi6vyDYqOQ=
+google.golang.org/genproto v0.0.0-20220923205249-dd2d53f1fffc/go.mod h1:yEEpwVWKMZZzo81NwRgyEJnA2fQvpXAYPVisv8EgDVs=
 google.golang.org/grpc v0.0.0-20160317175043-d3ddb4469d5a/go.mod h1:yo6s7OP7yaDglbqo1J04qKzAhqBH6lvTonzMVmEdcZw=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.20.1/go.mod h1:10oTOabMzJvdu6/UiuZezV6QK5dSlG84ov/aaiqXj38=
@@ -1959,6 +1960,8 @@ jochum.dev/jo-micro/auth2 v0.3.2 h1:dWY7RPLS3/Sn7YWDz4Kl8Str6lzMXUdfbMBLJLXmehk=
 jochum.dev/jo-micro/auth2 v0.3.2/go.mod h1:VRGDU1tsDrlEVN9ch3DlvhUslDTQGGp3KLReBRL6V1s=
 jochum.dev/jo-micro/auth2 v0.3.3 h1:mL8ipUfgNx2d5/JeuW7i1P/ZUzUpVT8G9WYH02xr/vA=
 jochum.dev/jo-micro/auth2 v0.3.3/go.mod h1:14yXAQkyHYC1RyHNoweNZahsRsaHrCEek7YlXDtt7Hg=
+jochum.dev/jo-micro/auth2 v0.4.0 h1:rBJG85pTyfauwNvgzRv39HjQw9EQYD1az9UYu5/aISw=
+jochum.dev/jo-micro/auth2 v0.4.0/go.mod h1:PXMhmzxBvDUzJ5kT39878heQDYtnLB8elUHoGJIlqNw=
 jochum.dev/jo-micro/buncomponent v0.0.1 h1:UHLODCgkv0x29jt46SPZ8h20WCT2B8ZNG9wW1OQwdVQ=
 jochum.dev/jo-micro/buncomponent v0.0.1/go.mod h1:nQLcdOa3KMOZpm6SLmZK0ef18fX3V9L0BdABdedHiD4=
 jochum.dev/jo-micro/components v0.0.11 h1:Rtm0J+MiMcyFVrweJ3r1eoxQY5qP59GzC1TPc7O9Ixs=
