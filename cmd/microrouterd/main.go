@@ -96,10 +96,12 @@ func main() {
 	auth2RouterReg.Register(jwtRouter.New())
 
 	iService := micro.NewService()
-	iCReg := components.New(iService, "router", logruscomponent.New(), auth2.ClientAuthComponent(), router.New())
+	iCReg := components.New(iService, "router", logruscomponent.New(), auth2.RouterAuthComponent(), auth2.ClientAuthComponent(), router.New())
 
-	auth2ClientReg := auth2.ClientAuthMustReg(iCReg)
-	auth2ClientReg.Register(jwtClient.New())
+	iAuth2RouterReg := auth2.RouterAuthMustReg(iCReg)
+	iAuth2RouterReg.Register(jwtRouter.New())
+	iAuth2ClientReg := auth2.ClientAuthMustReg(iCReg)
+	iAuth2ClientReg.Register(jwtClient.New())
 
 	var r *gin.Engine
 
