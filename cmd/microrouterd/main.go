@@ -28,10 +28,12 @@ import (
 func internalService(cReg *components.Registry, r *gin.Engine) {
 	routerHandler := handler.New()
 
+	auth2ClientReg := auth2.ClientAuthMustReg(cReg)
+
 	opts := []micro.Option{
 		micro.Name(config.Name + "-internal"),
 		micro.Version(config.Version),
-		micro.WrapHandler(cReg.WrapHandler()),
+		micro.WrapHandler(auth2ClientReg.WrapHandler()),
 		micro.Action(func(c *cli.Context) error {
 			// Start the components
 			if err := cReg.Init(c); err != nil {
