@@ -14,14 +14,12 @@ import (
 	"jochum.dev/jo-micro/auth2"
 	jwtClient "jochum.dev/jo-micro/auth2/plugins/client/jwt"
 	jwtRouter "jochum.dev/jo-micro/auth2/plugins/router/jwt"
-	"jochum.dev/jo-micro/auth2/plugins/verifier/endpointroles"
 	"jochum.dev/jo-micro/components"
 	"jochum.dev/jo-micro/logruscomponent"
 	"jochum.dev/jo-micro/router"
 
 	"jochum.dev/jo-micro/router/cmd/microrouterd/config"
 	"jochum.dev/jo-micro/router/cmd/microrouterd/handler"
-	"jochum.dev/jo-micro/router/internal/proto/routerserverpb"
 	"jochum.dev/jo-micro/router/internal/util"
 )
 
@@ -46,20 +44,6 @@ func internalService(cReg *components.Registry, r *gin.Engine) {
 				logger.Fatal(err)
 				return err
 			}
-
-			routerserverpb.RegisterRouterServerServiceHandler(cReg.Service().Server(), routerHandler)
-
-			authVerifier := endpointroles.NewVerifier(
-				endpointroles.WithLogrus(logruscomponent.MustReg(cReg).Logger()),
-			)
-			authVerifier.AddRules(
-				endpointroles.RouterRule,
-				endpointroles.NewRule(
-					endpointroles.Endpoint(routerserverpb.RouterServerService.Routes),
-					endpointroles.RolesAllow(auth2.RolesServiceAndAdmin),
-				),
-			)
-			auth2.ClientAuthMustReg(cReg).Plugin().SetVerifier(authVerifier)
 
 			return nil
 		}),

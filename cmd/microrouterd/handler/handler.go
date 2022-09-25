@@ -23,6 +23,7 @@ import (
 	"go-micro.dev/v4/logger"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"jochum.dev/jo-micro/auth2"
+	"jochum.dev/jo-micro/auth2/plugins/verifier/endpointroles"
 	"jochum.dev/jo-micro/components"
 	"jochum.dev/jo-micro/logruscomponent"
 	"jochum.dev/jo-micro/router"
@@ -219,6 +220,20 @@ func (h *Handler) Init(r *components.Registry, engine *gin.Engine, refreshSecond
 			router.RatelimitClientIP("1-S", "50-M", "1000-H"),
 		),
 	)
+
+	authVerifier := endpointroles.NewVerifier(
+		endpointroles.WithLogrus(logruscomponent.MustReg(h.cReg).Logger()),
+	)
+	authVerifier.AddRules(
+		endpointroles.RouterRule,
+		endpointroles.NewRule(
+			endpointroles.Endpoint(routerserverpb.RouterServerService.Routes),
+			endpointroles.RolesAllow(auth2.RolesServiceAndAdmin),
+		),
+	)
+	auth2.ClientAuthMustReg(h.cReg).Plugin().AddVerifier(authVerifier)
+
+	routerserverpb.RegisterRouterServerServiceHandler(h.cReg.Service().Server(), h)
 
 	return nil
 }
