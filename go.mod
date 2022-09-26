@@ -15,8 +15,8 @@ require (
 	github.com/urfave/cli/v2 v2.16.3
 	go-micro.dev/v4 v4.8.1
 	google.golang.org/protobuf v1.28.1
-	jochum.dev/jo-micro/auth2 v0.5.3
-	jochum.dev/jo-micro/components v0.3.0
+	jochum.dev/jo-micro/auth2 v0.5.4
+	jochum.dev/jo-micro/components v0.3.2
 	jochum.dev/jo-micro/logruscomponent v0.0.4
 )
 
@@ -68,7 +68,6 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect

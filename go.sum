@@ -170,7 +170,6 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6poM+XZ2dLUbcbE=
 github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
-github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
@@ -309,11 +308,11 @@ gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-jochum.dev/jo-micro/auth2 v0.5.2 h1:WstP5wQ+escaf8mrpHvIb7Litr2cfcy5Fn/6wxR2AHE=
-jochum.dev/jo-micro/auth2 v0.5.2/go.mod h1:jXoqG9aK9CzRbxdSw0n7P9mmqZJwCqpewgWiM7EDGnY=
 jochum.dev/jo-micro/auth2 v0.5.3 h1:rkYcGrn6xMoE4/0l19yyQ8sYHg6tHOuZVyKlzkEaNt4=
 jochum.dev/jo-micro/auth2 v0.5.3/go.mod h1:7NTjyywV3g6u8XdXpq8TcAQKuWFnpzBf3TYVD3xL4hQ=
-jochum.dev/jo-micro/components v0.3.0 h1:mo9IzK6UVbQuIit+vp74RFeT/VtS5mVv0ggBZ9q0tiE=
-jochum.dev/jo-micro/components v0.3.0/go.mod h1:Yvn0Qz1zctUQUI6WIjq7PbfLY87Qvywpw+KxnVZeCvA=
+jochum.dev/jo-micro/auth2 v0.5.4 h1:gHF84nYpFBUBYiQy/2411QeRRSlskXkK45+NgNypt5s=
+jochum.dev/jo-micro/auth2 v0.5.4/go.mod h1:2tJTA5Hy5/A9XBsaKQuFsSM+ukrSRuJ1uTNU77Rir7A=
+jochum.dev/jo-micro/components v0.3.2 h1:Z6Od76Uh2C2+bKhfZvaDLbry8vWGe4Ie/rDfrObE1pg=
+jochum.dev/jo-micro/components v0.3.2/go.mod h1:MXpsIY5Gut4/wDNquiCN+e4zYtATVwn+7uiNKj4nlKk=
 jochum.dev/jo-micro/logruscomponent v0.0.4 h1:KkJhLIM0mm2tlk+z+gZdpb5vCeuBs6bhG3bncGhCqoQ=
 jochum.dev/jo-micro/logruscomponent v0.0.4/go.mod h1:NVy+eN3Xm2SlzdsQGuC/9/+MwU+8BwxFZuaTprmLguU=
