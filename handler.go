@@ -53,9 +53,10 @@ func (h *Handler) Init(r *components.Registry, cli *cli.Context) error {
 
 	h.routerURI = cli.String(fmt.Sprintf("%s_router_basepath", strings.ToLower(r.FlagPrefix())))
 
+	logger := logruscomponent.MustReg(r).Logger()
 	if _, err := r.Get(auth2.ClientAuthName); err != nil {
 		authVerifier := endpointroles.NewVerifier(
-			endpointroles.WithLogrus(logruscomponent.MustReg(r).Logger()),
+			endpointroles.WithLogrus(logger),
 		)
 		authVerifier.AddRules(
 			endpointroles.NewRule(
@@ -64,6 +65,8 @@ func (h *Handler) Init(r *components.Registry, cli *cli.Context) error {
 			),
 		)
 		auth2.ClientAuthMustReg(r).Plugin().AddVerifier(authVerifier)
+	} else {
+		logger.Warnf("cant register a rule for RouterClientService, component %s not found", auth2.ClientAuthName)
 	}
 
 	h.RegisterWithServer(r.Service().Server())
