@@ -1,4 +1,6 @@
-[![Build Status](https://drone.fk.jochum.dev/api/badges/jo-micro/router/status.svg)](https://drone.fk.jochum.dev/jo-micro/router) [![Go Reference](https://pkg.go.dev/badge/jochum.dev/jo-micro/router.svg)](https://pkg.go.dev/jochum.dev/jo-micro/router)
+[![Build Status](https://drone.fk.jochum.dev/api/badges/jo-micro/router/status.svg)](https://drone.fk.jochum.dev/jo-micro/router)
+[![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg?style=flat-square)](LICENSE)
+[![Go Reference](https://pkg.go.dev/badge/jochum.dev/jo-micro/router.svg)](https://pkg.go.dev/jochum.dev/jo-micro/router)
 
 # router
 
